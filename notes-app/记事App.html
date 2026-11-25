@@ -35,7 +35,7 @@ button{font-family:inherit;cursor:pointer}
 /* ---------- 主页：左分类 + 右列表 ---------- */
 .notes-layout{display:flex;gap:10px;min-height:100%}
 .cat-bar{width:88px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
-.cat-item{display:flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;border-radius:10px;padding:9px 7px;font-size:14px;color:var(--muted);text-align:left;transition:background .15s,color .15s}
+.cat-item{display:flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;border-radius:0 10px 10px 0;padding:9px 1px 9px 7px;font-size:14px;color:var(--muted);text-align:left;transition:background .15s,color .15s}
 .cat-item .cat-icon{flex-shrink:0;line-height:1;display:flex}
 .cat-item .cat-icon svg{width:16px;height:16px;display:block}
 .cat-item .cat-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -212,7 +212,8 @@ button{font-family:inherit;cursor:pointer}
     <div class="setting-row"><span data-i18n="setting.importAll">导入备份（JSON）</span><button class="btn small" id="btn-import-all" data-i18n="setting.import">导入</button></div>
     <input type="file" id="import-file" accept="application/json,.json" hidden />
     <div class="setting-row"><span data-i18n="setting.language">语言</span><span class="lang-switch" id="lang-switch">
-      <button class="btn small lang-opt" data-lang="zh">中文</button>
+      <button class="btn small lang-opt" data-lang="zh">简体</button>
+      <button class="btn small lang-opt" data-lang="zhTW">繁體</button>
       <button class="btn small lang-opt" data-lang="en">English</button>
     </span></div>
     <div class="setting-row"><span data-i18n="setting.about">关于</span><span id="about-ver" style="color:var(--muted);font-size:13px"></span></div>
@@ -234,7 +235,7 @@ button{font-family:inherit;cursor:pointer}
     <div class="editor-body">
       <input id="note-title" class="title-input" type="text" data-i18n-ph="ph.untitled" placeholder="无标题" />
       <textarea id="note-content" class="content-area" data-i18n-ph="ph.start" placeholder="开始记录…"></textarea>
-      <textarea id="todo-text" class="content-area todo-area" data-i18n-ph="ph.todo" placeholder="待办内容…" hidden></textarea>
+      <textarea id="todo-text" class="content-area todo-area" data-i18n-ph="ph.record" placeholder="记录内容…" hidden></textarea>
       <textarea id="todo-note" class="content-area todo-note" data-i18n-ph="ph.note" placeholder="补充说明（可选）" hidden></textarea>
       <button type="button" id="editor-cat" class="cat-select">
         <span id="editor-cat-name" class="cat-select-name"></span>
@@ -299,10 +300,23 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.17";
-const PRESET_CATS=["生活","家庭","工作","理财"];
-const EXEC_CATS=["个人","家庭"];
-const WORK_CATS=["个人","公司"];
+const APP_VERSION="2.21";
+// 标配分类用稳定 ID 存储，显示名随当前语言走 CAT_LABEL 字典；自定义分类存原名
+const PRESET_CATS=["life","family","work","finance"];
+const EXEC_CATS=["personal","family"];
+const WORK_CATS=["personal","company"];
+const CAT_ZH2ID={"生活":"life","家庭":"family","工作":"work","理财":"finance","个人":"personal","公司":"company"};
+const CAT_LABEL={
+  zh:   {life:"生活",family:"家庭",work:"工作",finance:"理财",personal:"个人",company:"公司"},
+  zhTW: {life:"生活",family:"家庭",work:"工作",finance:"理財",personal:"個人",company:"公司"},
+  en:   {life:"Life",family:"Family",work:"Work",finance:"Finance",personal:"Personal",company:"Company"}
+};
+function catLabel(c){
+  if(!c) return t("cat.uncat");
+  const map=CAT_LABEL[state.lang]||CAT_LABEL.zh;
+  return map[c]||CAT_LABEL.zh[c]||c;
+}
+function migrateCat(c){ return CAT_ZH2ID[c]||c; }
 
 const ALL_CAT="__all__";
 const LANG_KEY="notes-app-v1-lang";
@@ -350,6 +364,28 @@ const I18N={
     "modal.discard":"Discard changes","modal.discardMsg":"You have unsaved changes. Leave anyway?",
     "modal.clearData":"Clear data","modal.clearMsg":"Delete all local records? This cannot be undone.",
     "drawer.catManage":"Categories","drawer.add":"Add","drawer.done":"Done","drawer.chooseCat":"Choose category"
+  },
+  zhTW:{
+    "tab.notes":"執行","tab.work":"工作","tab.home":"支付","tab.settings":"設定",
+    "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
+    "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
+    "setting.language":"語言","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
+    "cat.all":"總覽","cat.uncat":"未分類",
+    "empty.homeAll":"尚無待辦","empty.homeCat":"該分類尚無待辦",
+    "empty.notesAll":"還沒有執行記錄，點右上角 ＋ 新增","empty.notesCat":"該分類尚無執行記錄",
+    "empty.workAll":"還沒有工作記錄，點右上角 ＋ 新增","empty.workCat":"該分類尚無工作記錄",
+    "card.untitled":"無標題","card.noBody":"（無正文）",
+    "toast.storage":"本地儲存空間不足，部分內容可能未儲存","toast.empty":"內容為空，未儲存","toast.saved":"已儲存","toast.deleted":"已刪除",
+    "toast.nfTodo":"找不到該待辦","toast.nfNote":"找不到該筆記","toast.nfWork":"找不到該工作記錄",
+    "toast.nameEmpty":"名稱不能為空","toast.catExists":"該分類已存在","toast.oneCat":"至少保留一個分類",
+    "toast.renamed":"已修改","toast.catDeleted":"已刪除分類","toast.catAdded":"已新增分類","toast.exported":"已匯出全部資料","toast.cleared":"已清空","toast.imported":"已匯入備份","toast.badBackup":"備份檔案無效",
+    "modal.confirm":"確定","modal.cancel":"取消","modal.leave":"離開","modal.clear":"清空",
+    "modal.import":"匯入備份","modal.importMsg":"匯入將覆蓋目前本地全部記錄，確定繼續？",
+    "modal.delTodo":"刪除待辦","modal.delWork":"刪除工作記錄","modal.delNote":"刪除筆記","modal.delConfirm":"確定刪除這條記錄？此操作無法復原。",
+    "modal.renameCat":"修改分類","modal.delCat":"刪除分類","modal.delCatMsg":"刪除分類「{c}」？其下記錄將歸入「{f}」。",
+    "modal.discard":"放棄修改","modal.discardMsg":"有未儲存的修改，確定離開？",
+    "modal.clearData":"清空資料","modal.clearMsg":"確定清空本地全部記錄？此操作無法復原。",
+    "drawer.catManage":"分類管理","drawer.add":"新增","drawer.done":"完成","drawer.chooseCat":"選擇分類"
   }
 };
 function t(key,vars){
@@ -396,7 +432,7 @@ function applyStaticText(){
   document.querySelectorAll("#lang-switch .lang-opt").forEach(b=>b.classList.toggle("active",b.dataset.lang===state.lang));
 }
 function setLang(lang){
-  if(lang!=="zh"&&lang!=="en")lang="zh";
+  if(!I18N[lang])lang="zh";
   state.lang=lang; save(LANG_KEY,lang);
   applyStaticText(); renderAll(); switchTab(state.tab);
 }
@@ -450,12 +486,12 @@ function ensureValidCat(){
   if(!cats.includes(state.filterCat)) state.filterCat=ALL_CAT;
 }
 const CAT_SVG={
-  "生活":`<path d="M5 19C5 9 13 5 19 5c0 8-4 14-12 14"/><path d="M5 19c3-4 6-7 10-9"/>`,
-  "家庭":`<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="16.8" cy="9" r="2.4"/>`,
-  "工作":`<rect x="3.5" y="5" width="17" height="11" rx="2"/><path d="M9 20.5h6M12 16v4.5"/>`,
-  "理财":`<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.3 9.6h4.2a1.7 1.7 0 0 1 0 3.4h-3a1.7 1.7 0 0 0 0 3.4h4.2"/>`,
-  "个人":`<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/>`,
-  "公司":`<rect x="5" y="4.5" width="14" height="15.5" rx="1"/><path d="M9 8.5h1.5M13.5 8.5H15M9 12h1.5M13.5 12H15M9 15.5h1.5M13.5 15.5H15"/>`
+  "life":`<path d="M5 19C5 9 13 5 19 5c0 8-4 14-12 14"/><path d="M5 19c3-4 6-7 10-9"/>`,
+  "family":`<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="16.8" cy="9" r="2.4"/>`,
+  "work":`<rect x="3.5" y="5" width="17" height="11" rx="2"/><path d="M9 20.5h6M12 16v4.5"/>`,
+  "finance":`<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.3 9.6h4.2a1.7 1.7 0 0 1 0 3.4h-3a1.7 1.7 0 0 0 0 3.4h4.2"/>`,
+  "personal":`<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/>`,
+  "company":`<rect x="5" y="4.5" width="14" height="15.5" rx="1"/><path d="M9 8.5h1.5M13.5 8.5H15M9 12h1.5M13.5 12H15M9 15.5h1.5M13.5 15.5H15"/>`
 };
 function catIcon(c){
   const inner=CAT_SVG[c]||`<path d="M3.5 6.5h5l2 2.5h10V19H3.5z"/>`;
@@ -466,14 +502,14 @@ function catIcon(c){
 function cardHtml(n,hideCat){
   return `<div class="nc-title ${n.title?"":"empty"}">${esc(n.title||t("card.untitled"))}</div>
     <div class="nc-summary">${esc(textFromHtml(n.content))||t("card.noBody")}</div>`
-    +((!hideCat&&n.category)?`<div class="nc-cat">${esc(n.category)}</div>`:"");
+    +((!hideCat&&n.category)?`<div class="nc-cat">${esc(catLabel(n.category))}</div>`:"");
 }
 function bindCard(box,n,onClick,persistFn,idx,overview,cat){
   overview=!!overview;
   const card=document.createElement("div");
   card.className="note-card"+(overview||idx===0?" first":"")+(overview?" overview":"")+(n.done?" done":"");
   const left=overview
-    ? `<span class="nc-cat-label">${esc(cat||t("cat.uncat"))}</span>`
+    ? `<span class="nc-cat-label">${esc(catLabel(cat))}</span>`
     : `<span class="nc-index">${idx+1}</span>`;
   const check=overview?"":`<input type="checkbox" ${n.done?"checked":""}/>`;
   card.innerHTML=`
@@ -501,8 +537,8 @@ function renderCatBar(){
   orderedCats().forEach(c=>{
     const b=document.createElement("button");
     b.className="cat-item"+(state.filterCat===c?" active":"");
-    b.innerHTML=`<span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${esc(c)}</span>`;
-    b.title=c;
+    b.innerHTML=`<span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${esc(catLabel(c))}</span>`;
+    b.title=catLabel(c);
     b.addEventListener("click",()=>{state.filterCat=c;renderCatBar();renderHomeList();});
     bar.appendChild(b);
   });
@@ -575,7 +611,7 @@ function renderHomeList(){
     const row=document.createElement("div");
     row.className="todo-row"+(overview?" overview":"")+(t.done?" done":"")+((overview||idx===0)?" first":"");
     const left=overview
-      ? `<span class="tr-cat">${esc(cat)}</span>`
+      ? `<span class="tr-cat">${esc(catLabel(cat))}</span>`
       : `<span class="tr-index">${idx+1}</span>`;
     const check=overview?"":`<input type="checkbox" ${t.done?"checked":""}/>`;
     row.innerHTML=`
@@ -601,8 +637,8 @@ function renderSideBar(barId,cats,filterKey,listRender){
   cats.forEach(c=>{
     const b=document.createElement("button");
     b.className="cat-item"+(state[filterKey]===c?" active":"");
-    b.innerHTML=`<span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${esc(c)}</span>`;
-    b.title=c;
+    b.innerHTML=`<span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${esc(catLabel(c))}</span>`;
+    b.title=catLabel(c);
     b.addEventListener("click",()=>{state[filterKey]=c;renderSideBar(barId,cats,filterKey,listRender);listRender();});
     bar.appendChild(b);
   });
@@ -661,7 +697,8 @@ $("#top-add").addEventListener("click",()=>{ if(state.tab==="notes") newNote(); 
 
 /* ---------- 编辑器 ---------- */
 function renderCatSelect(){
-  $("#editor-cat-name").textContent=state.draft.category||categories()[0]||"";
+  const dc=state.draft.category||categories()[0]||"";
+  $("#editor-cat-name").textContent=dc?catLabel(dc):"";
 }
 function openCatPicker(){ renderCpList(); $("#cat-picker").hidden=false; }
 function closeCatPicker(){ $("#cat-picker").hidden=true; }
@@ -670,7 +707,7 @@ function renderCpList(){
   editorCats().forEach(c=>{
     const li=document.createElement("div");
     li.className="cp-item"+(state.draft.category===c?" active":"");
-    li.innerHTML=`<span class="cp-name">${esc(c)}</span><svg class="cp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
+    li.innerHTML=`<span class="cp-name">${esc(catLabel(c))}</span><svg class="cp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
     li.addEventListener("click",()=>{ state.draft.category=c; renderCatSelect(); closeCatPicker(); });
     box.appendChild(li);
   });
@@ -683,7 +720,7 @@ function applyEditorMode(){
   $("#todo-note").hidden=false;
   $("#editor-cat").hidden=false;
   $("#editor-count").hidden=true;
-  $("#todo-text").placeholder=todo?t("ph.todo"):t("ph.record");
+  $("#todo-text").placeholder=t("ph.record");
 }
 function fillTodo(todo){
   $("#todo-text").value=todo.text||"";
@@ -811,7 +848,7 @@ function renderCatManager(){
     const li=document.createElement("div");
     li.className="cm-item";
     li.dataset.cat=c;
-    li.innerHTML=`<span class="cm-grip">${GRIP_SVG}</span><span class="cm-name">${esc(c)}</span>
+    li.innerHTML=`<span class="cm-grip">${GRIP_SVG}</span><span class="cm-name">${esc(catLabel(c))}</span>
       <button class="rename" title="${t("action.rename")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m13.5 6.5 3 3"/></svg></button>
       <button class="del" title="${t("action.delete")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2M6.5 7l1 12h9l1-12"/><path d="M10 11v5M14 11v5"/></svg></button>`;
     li.querySelector(".rename").addEventListener("click",async()=>{
@@ -834,7 +871,7 @@ function renderCatManager(){
       const cats=categories();
       if(cats.length<=1)return toast(t("toast.oneCat"));
       const fallback=cats[0]===c?cats[1]:cats[0];
-      const ok=await modalConfirm(t("modal.delCat"),t("modal.delCatMsg",{c,f:fallback}),{danger:true,okText:t("action.delete")});
+      const ok=await modalConfirm(t("modal.delCat"),t("modal.delCatMsg",{c:catLabel(c),f:catLabel(fallback)}),{danger:true,okText:t("action.delete")});
       if(!ok)return;
       state.notes.forEach(n=>{if(n.category===c)n.category=fallback;});
       state.todos.forEach(t=>{if(t.category===c)t.category=fallback;});
@@ -876,9 +913,9 @@ function importBackup(file){
     const ok=await modalConfirm(t("modal.import"),t("modal.importMsg"),{okText:t("setting.import")});
     if(!ok)return;
     const ts=new Date().toISOString().slice(0,19);
-    state.todos=data.todos.map(x=>({id:x.id||uid(),text:x.text||"",note:x.note||"",category:x.category||PRESET_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
-    state.notes=data.notes.map(x=>({id:x.id||uid(),title:x.title||"",content:x.content||"",category:EXEC_CATS.includes(x.category)?x.category:EXEC_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
-    state.workNotes=data.workNotes.map(x=>({id:x.id||uid(),title:x.title||"",content:x.content||"",category:WORK_CATS.includes(x.category)?x.category:WORK_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
+    state.todos=data.todos.map(x=>({id:x.id||uid(),text:x.text||"",note:x.note||"",category:migrateCat(x.category)||PRESET_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
+    state.notes=data.notes.map(x=>{const c=migrateCat(x.category);return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:EXEC_CATS.includes(c)?c:EXEC_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
+    state.workNotes=data.workNotes.map(x=>{const c=migrateCat(x.category);return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:WORK_CATS.includes(c)?c:WORK_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
     persistTodos();persistNotes();persistWork();
     renderAll(); toast(t("toast.imported"));
   };
@@ -891,11 +928,11 @@ function seedTodos(){
   const ts=(min)=>new Date(now-min*60000).toISOString().slice(0,19);
   const t=(text,category,done,min)=>({id:uid(),text,category,done:!!done,created_at:ts(min),updated_at:ts(min)});
   return [
-    t("买牛奶","生活",false,120), t("买面包","生活",false,120), t("买鸡蛋","生活",true,120),
-    t("晨跑 3 公里","生活",false,200), t("记录体重","生活",false,200),
-    t("缴水电费","家庭",false,300), t("整理缴费凭证","家庭",true,300), t("周日通话","家庭",false,360),
-    t("整理本周数据","工作",false,90), t("撰写周报总结","工作",false,90), t("同步纪要给团队","工作",true,420),
-    t("核对各类开销","理财",false,500)
+    t("买牛奶","life",false,120), t("买面包","life",false,120), t("买鸡蛋","life",true,120),
+    t("晨跑 3 公里","life",false,200), t("记录体重","life",false,200),
+    t("缴水电费","family",false,300), t("整理缴费凭证","family",true,300), t("周日通话","family",false,360),
+    t("整理本周数据","work",false,90), t("撰写周报总结","work",false,90), t("同步纪要给团队","work",true,420),
+    t("核对各类开销","finance",false,500)
   ];
 }
 function seedNotes(){
@@ -903,14 +940,14 @@ function seedNotes(){
   const ts=(min)=>new Date(now-min*60000).toISOString().slice(0,19);
   const n=(title,content,category,min)=>({id:uid(),title,category,content,created_at:ts(min),updated_at:ts(min)});
   return [
-    n("周末采购清单","周末去一趟超市，把冰箱和日用品补齐。","个人",120),
-    n("健身计划","本周目标：晨跑三次，每次三公里，睡前拉伸。","个人",200),
-    n("家庭账单整理","核对本月水电燃气费，记得按时缴费。","家庭",300),
-    n("给爸妈打电话","周日晚上给爸妈通个电话，聊聊近况。","家庭",360),
-    n("项目周报草稿","本周进展：完成接口联调，下周进入测试阶段。","个人",90),
-    n("产品评审会议纪要","评审结论：首页分类调整方案通过，排期到下个迭代。","个人",420),
-    n("月度记账复盘","复盘本月收支，看看哪些开销可以压缩。","个人",500),
-    n("基金定投记录","记录本月定投金额与持仓情况，长期持有。","个人",600)
+    n("周末采购清单","周末去一趟超市，把冰箱和日用品补齐。","personal",120),
+    n("健身计划","本周目标：晨跑三次，每次三公里，睡前拉伸。","personal",200),
+    n("家庭账单整理","核对本月水电燃气费，记得按时缴费。","family",300),
+    n("给爸妈打电话","周日晚上给爸妈通个电话，聊聊近况。","family",360),
+    n("项目周报草稿","本周进展：完成接口联调，下周进入测试阶段。","personal",90),
+    n("产品评审会议纪要","评审结论：首页分类调整方案通过，排期到下个迭代。","personal",420),
+    n("月度记账复盘","复盘本月收支，看看哪些开销可以压缩。","personal",500),
+    n("基金定投记录","记录本月定投金额与持仓情况，长期持有。","personal",600)
   ];
 }
 function seedWork(){
@@ -918,9 +955,9 @@ function seedWork(){
   const ts=(min)=>new Date(now-min*60000).toISOString().slice(0,19);
   const w=(title,content,category,min)=>({id:uid(),title,category,content,created_at:ts(min),updated_at:ts(min)});
   return [
-    w("项目排期确认","对齐下个迭代需求范围，确认评审与上线时间节点。","公司",150),
-    w("客户跟进记录","跟进本周客户反馈，整理待答复事项与下次沟通时间。","公司",260),
-    w("周报汇总要点","汇总本周完成事项、风险与下周计划，同步给团队。","个人",380)
+    w("项目排期确认","对齐下个迭代需求范围，确认评审与上线时间节点。","company",150),
+    w("客户跟进记录","跟进本周客户反馈，整理待答复事项与下次沟通时间。","company",260),
+    w("周报汇总要点","汇总本周完成事项、风险与下周计划，同步给团队。","personal",380)
   ];
 }
 
@@ -959,10 +996,10 @@ function init(){
   if(old&&old.length&&!hasNew){
     old.forEach(o=>{
       (o.todos||[]).forEach(td=>{
-        state.todos.push({id:uid(),text:td.text,category:o.category,done:!!td.done,created_at:o.created_at,updated_at:o.updated_at});
+        state.todos.push({id:uid(),text:td.text,category:migrateCat(o.category),done:!!td.done,created_at:o.created_at,updated_at:o.updated_at});
       });
       if(o.title||textFromHtml(o.content)){
-        state.notes.push({id:o.id||uid(),title:o.title||"",content:o.content||"",category:o.category,created_at:o.created_at,updated_at:o.updated_at});
+        state.notes.push({id:o.id||uid(),title:o.title||"",content:o.content||"",category:migrateCat(o.category),created_at:o.created_at,updated_at:o.updated_at});
       }
     });
     localStorage.removeItem(OLD_KEY);
@@ -975,12 +1012,12 @@ function init(){
     }
   }
   if(!state.workNotes.length){ state.workNotes=seedWork(); persistWork(); }
-  state.todos.forEach(t=>{if(!t.id)t.id=uid();});
-  state.notes.forEach(n=>{if(!n.id)n.id=uid(); if(n.done===undefined)n.done=false; if(!EXEC_CATS.includes(n.category))n.category=EXEC_CATS[0];});
-  state.workNotes.forEach(w=>{if(!w.id)w.id=uid(); if(w.done===undefined)w.done=false; if(!WORK_CATS.includes(w.category))w.category=WORK_CATS[0];});
-  state.customCats=loadCats();
-  state.catOrder=loadOrder();
-  state.retired=loadRetired();
+  state.todos.forEach(t=>{if(!t.id)t.id=uid(); t.category=migrateCat(t.category);});
+  state.notes.forEach(n=>{if(!n.id)n.id=uid(); if(n.done===undefined)n.done=false; n.category=migrateCat(n.category); if(!EXEC_CATS.includes(n.category))n.category=EXEC_CATS[0];});
+  state.workNotes.forEach(w=>{if(!w.id)w.id=uid(); if(w.done===undefined)w.done=false; w.category=migrateCat(w.category); if(!WORK_CATS.includes(w.category))w.category=WORK_CATS[0];});
+  state.customCats=(loadCats()||[]).map(migrateCat);
+  state.catOrder=(loadOrder()||[]).map(migrateCat);
+  state.retired=(loadRetired()||[]).map(migrateCat);
   setupSortable($("#cm-list"),{
     gripSel:".cm-grip",itemSel:".cm-item",dataAttr:"cat",
     onReorder:order=>{state.catOrder=order;persistOrder();renderCatBar();renderHomeList();renderCatManager();}
