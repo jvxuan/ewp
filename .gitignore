@@ -1,0 +1,20 @@
+# 临时工具结果
+.tmp-tool-results/
+
+# 运行时数据 / 日志（早期全栈原型）
+notes-app/data/
+notes-app/uploads/
+notes-app/server.log
+
+# APK 构建中间产物、签名密钥与产物包
+apk-shell/build/
+*.apk
+*.idsig
+*.keystore
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 系统文件
+.DS_Store

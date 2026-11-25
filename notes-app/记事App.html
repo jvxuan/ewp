@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>EWP</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d0d0d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='3.5' width='14' height='17' rx='2'/><path d='M9 8h6M9 12h6'/></svg>" />
+<style>
+:root{
+  --bg:#f7f7f8; --panel:#ffffff; --border:#e8e8e8; --text:#0d0d0d; --muted:#8e8e8e;
+  --primary:#0d0d0d; --primary-soft:#f0f0f1; --done-soft:#f5f5f6; --danger:#e5484d; --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer}
+
+.phone{width:100%;max-width:430px;height:100vh;height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 24px rgba(0,0,0,.08)}
+@media(min-width:480px){ body{padding:24px 0} .phone{height:92vh;border-radius:28px;border:1px solid var(--border)} }
+
+/* 顶栏 */
+.topbar{display:flex;align-items:center;gap:10px;height:48px;min-height:48px;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--border)}
+.topbar .top-title{font-size:18px;font-weight:700;flex:1}
+.topbar .icon-btn{border:none;background:transparent;width:36px;height:36px;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topbar .icon-btn:hover{background:transparent}
+.topbar .icon-btn svg{width:19px;height:19px;display:block}
+#top-add{font-size:24px;font-weight:600;line-height:1}
+.top-actions{display:flex;align-items:center;gap:8px}
+
+.view{flex:1;overflow-y:auto;padding:12px 12px 18px}
+.view[hidden]{display:none}
+/* 带分类侧栏的主页：左侧贴边，去掉页面左边距 */
+#view-home,#view-notes,#view-work{padding-left:0}
+
+/* ---------- 主页：左分类 + 右列表 ---------- */
+.notes-layout{display:flex;gap:10px;min-height:100%}
+.cat-bar{width:88px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.cat-item{display:flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;border-radius:10px;padding:9px 7px;font-size:14px;color:var(--muted);text-align:left;transition:background .15s,color .15s}
+.cat-item .cat-icon{flex-shrink:0;line-height:1;display:flex}
+.cat-item .cat-icon svg{width:16px;height:16px;display:block}
+.cat-item .cat-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat-item.no-icon .cat-name{padding-left:0;text-align:center}
+.cat-item:hover{background:var(--primary-soft);color:var(--text)}
+.cat-item.active{background:var(--primary-soft);color:var(--text);font-weight:600}
+
+.note-pane{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pane-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.note-list{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
+
+.note-card{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;cursor:pointer}
+.note-card:hover{background:var(--primary-soft)}
+.note-card.done{background:var(--done-soft)}
+.note-card .nc-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
+.note-card .nc-body{flex:1;min-width:0}
+.note-card input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--text)}
+.note-card .nc-title{font-weight:600;font-size:15px;margin-bottom:4px}
+.note-card .nc-title.empty{color:var(--muted)}
+.note-card.done .nc-title{text-decoration:line-through;color:var(--muted)}
+.note-card .nc-summary{font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.note-card .nc-cat{font-size:12px;color:var(--muted);margin-top:5px}
+.note-card .nc-cat-label{flex-shrink:0;width:48px;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden}
+.note-card.overview.first{background:var(--panel);border:1.5px solid #E8B547}
+.note-card.overview.first.done{background:var(--done-soft);border-color:var(--border)}
+.note-card.first{background:var(--panel);border:1.5px solid #E8B547}
+.note-card.first.done{background:var(--done-soft);border-color:var(--border)}
+
+/* 底部 Tab */
+.tabbar{display:flex;background:var(--panel);border-top:1px solid var(--border)}
+.tabbar .tab{flex:1;border:none;background:none;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#6b6b6b}
+.tabbar .tab .tab-icon{display:flex}
+.tabbar .tab .tab-icon svg{width:21px;height:21px;display:block}
+.tabbar .tab.active{color:#000;font-weight:600}
+.tabbar .tab .tab-icon .ic-filled{display:none}
+.tabbar .tab.active .tab-icon .ic-outline{display:none}
+.tabbar .tab.active .tab-icon .ic-filled{display:block}
+
+/* 占位页 */
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 24px;text-align:center;color:var(--muted)}
+.placeholder .ph-icon{font-size:44px}
+.placeholder h3{color:var(--text);font-size:16px}
+.setting-row{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px}
+
+/* ---------- 编辑页（独立视图） ---------- */
+#view-editor{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+#view-editor[hidden]{display:none}
+.editor-top{display:flex;align-items:center;gap:10px;height:48px;min-height:48px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)}
+.back-btn{border:none;background:transparent;width:36px;height:36px;font-size:28px;color:var(--text);display:flex;align-items:center;justify-content:center;line-height:1;padding-bottom:3px}
+.back-btn:hover{background:transparent}
+.editor-top .btn{margin-left:auto}
+.title-input{width:100%;font-size:20px;font-weight:700;border:1px solid var(--border);border-radius:12px;outline:none;background:var(--panel);color:var(--text);padding:12px 14px}
+.title-input:focus{border-color:var(--text)}
+.editor-body{flex:1;overflow-y:auto;padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px}
+.content-area{width:100%;min-height:180px;outline:none;border:1px solid var(--border);border-radius:12px;background:var(--panel);font-family:inherit;font-size:15px;line-height:1.75;resize:vertical;color:var(--text);padding:12px 14px}
+.content-area:focus{border-color:var(--text)}
+.cat-select{width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel);font-family:inherit;font-size:15px;color:var(--text);cursor:pointer}
+.cat-select-name{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat-select-arrow{width:16px;height:16px;flex-shrink:0;color:var(--muted)}
+.cp-item{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:12px 12px;cursor:pointer}
+.cp-item .cp-name{flex:1;font-size:14px}
+.cp-item .cp-check{width:18px;height:18px;flex-shrink:0;color:var(--text);display:none}
+.cp-item.active .cp-check{display:block}
+.cp-item.active{background:var(--primary-soft)}
+.todo-area{min-height:120px}
+.todo-note{min-height:72px;font-size:14px;color:var(--muted)}
+.editor-count{font-size:12px;color:var(--muted);text-align:right;padding:2px 2px 0}
+
+/* ---------- 分类管理抽屉 ---------- */
+.drawer-mask{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:70}
+.drawer{position:absolute;left:0;right:0;bottom:0;z-index:71;background:var(--panel);border-radius:20px 20px 0 0;padding:18px 18px 24px;max-height:70%;display:flex;flex-direction:column;gap:14px}
+.drawer h3{font-size:16px}
+.cm-add{display:flex;gap:8px}
+.cm-add input{flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none}
+.cm-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.cm-item{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:11px 12px}
+.cm-item .cm-grip{flex-shrink:0;color:#c9c9cc;display:flex;cursor:grab;touch-action:none}
+.cm-item .cm-grip svg{width:14px;height:14px;display:block}
+.cm-item.dragging{opacity:.5;box-shadow:0 6px 16px rgba(0,0,0,.15);background:var(--panel)}
+.cm-item .cm-name{flex:1;font-size:14px}
+.cm-item button{border:none;background:none;font-size:15px;color:var(--muted);display:flex;align-items:center;-webkit-tap-highlight-color:transparent}
+.cm-item button svg{width:17px;height:17px;display:block}
+.cm-item button:hover{color:var(--primary)}
+.cm-item button.del:hover{color:var(--danger)}
+
+/* 应用内弹窗 */
+.modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:80}
+.modal{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-50%);z-index:81;background:var(--panel);border-radius:18px;padding:20px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.modal-title{font-size:16px;font-weight:600}
+.modal-msg{font-size:14px;color:var(--muted);line-height:1.6}
+.modal-input{padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:15px;outline:none;background:var(--panel);color:var(--text)}
+.modal-input:focus{border-color:var(--text)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px}
+.modal-actions .btn.danger-ok{background:var(--danger);border-color:var(--danger);color:#fff}
+.modal-actions .btn.danger-ok:hover{opacity:.9;color:#fff}
+
+.btn{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:8px 13px;font-size:14px}
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.primary:hover{opacity:.9;color:#fff}
+.btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+.btn.small{padding:5px 10px;font-size:13px}
+.lang-switch{display:flex;gap:6px}
+.lang-opt{border:1px solid var(--border);background:var(--panel);color:var(--muted)}
+.lang-opt.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,34,40,.92);color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;z-index:999}
+.empty-tip{color:var(--muted);font-size:13px;text-align:center;padding:40px 0}
+
+/* 主页待办条目 */
+.todo-row{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 12px;cursor:pointer}
+.todo-row.done{background:var(--done-soft)}
+.todo-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--text)}
+.tr-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
+.tr-cat{flex-shrink:0;width:48px;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden}
+.todo-row .tr-body{flex:1;min-width:0}
+.todo-row .tr-text{font-size:15px;word-break:break-word}
+.tr-note{font-size:12.5px;color:var(--muted);word-break:break-word;margin-top:3px}
+.todo-row.done .tr-text{text-decoration:line-through;color:var(--muted)}
+.todo-row.first{background:var(--panel);border:1.5px solid #E8B547}
+.todo-row.first.done{background:var(--done-soft);border-color:var(--border)}
+.todo-row.overview.first{background:var(--panel);border:1.5px solid #E8B547}
+.todo-row.overview.first.done{background:var(--panel);border-color:#E8B547}
+.todo-row.first .tr-text{font-weight:600;color:var(--text)}
+.todo-row.first.done .tr-text{font-weight:400;color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <header class="topbar" id="main-topbar">
+    <span class="top-title" id="top-title">执行</span>
+    <div class="top-actions">
+      <button class="icon-btn" id="top-action" data-i18n-title="action.manage" title="管理分类"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></button>
+      <button class="icon-btn" id="top-add" data-i18n-title="action.new" title="新建">＋</button>
+    </div>
+  </header>
+
+  <!-- 主页：待办事项（左分类分组 + 右待办列表） -->
+  <section class="view" id="view-home">
+    <div class="notes-layout">
+      <aside class="cat-bar" id="cat-bar"></aside>
+      <div class="note-pane">
+        <div class="note-list" id="home-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 执行：卡片列表 + 分类侧栏 -->
+  <section class="view" id="view-notes">
+    <div class="notes-layout">
+      <aside class="cat-bar" id="notes-cat-bar"></aside>
+      <div class="note-pane">
+        <div class="note-list" id="notes-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 工作：卡片列表 + 分类侧栏（独立新表） -->
+  <section class="view" id="view-work">
+    <div class="notes-layout">
+      <aside class="cat-bar" id="work-cat-bar"></aside>
+      <div class="note-pane">
+        <div class="note-list" id="work-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 设置 -->
+  <section class="view" id="view-settings">
+    <div class="setting-row"><span data-i18n="setting.exportAll">导出全部数据（JSON）</span><button class="btn small" id="btn-export-all" data-i18n="setting.export">导出</button></div>
+    <div class="setting-row"><span data-i18n="setting.importAll">导入备份（JSON）</span><button class="btn small" id="btn-import-all" data-i18n="setting.import">导入</button></div>
+    <input type="file" id="import-file" accept="application/json,.json" hidden />
+    <div class="setting-row"><span data-i18n="setting.language">语言</span><span class="lang-switch" id="lang-switch">
+      <button class="btn small lang-opt" data-lang="zh">中文</button>
+      <button class="btn small lang-opt" data-lang="en">English</button>
+    </span></div>
+    <div class="setting-row"><span data-i18n="setting.about">关于</span><span id="about-ver" style="color:var(--muted);font-size:13px"></span></div>
+  </section>
+
+  <nav class="tabbar" id="main-tabbar">
+    <button class="tab active" data-tab="notes"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5l1.4 1.4L11 7.5M8 13.5l1.4 1.4L11 12.5M14.5 8.5H17M14.5 13.5H17"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="4" y="3.5" width="16" height="17" rx="2" fill="currentColor"/><path d="M8 8.6l1.3 1.3 1.9-2.1" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13.6l1.3 1.3 1.9-2.1" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.6 8.6h2.4M14.6 13.6h2.4" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></span><span data-i18n="tab.notes">执行</span></button>
+    <button class="tab" data-tab="work"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5v2M3.5 12h17"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><path d="M3.5 8.5h17V19a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19z" fill="currentColor"/><path d="M9 8.5V6A1.5 1.5 0 0 1 10.5 4.5h3A1.5 1.5 0 0 1 15 6v2.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" fill="none"/><path d="M3.5 12.5h17" stroke="#fff" stroke-width="1.7"/></svg></span><span data-i18n="tab.work">工作</span></button>
+    <button class="tab" data-tab="home"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M16 12.5h.01"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5" fill="currentColor"/><path d="M3.5 10h17" stroke="#fff" stroke-width="1.7"/><circle cx="16" cy="14" r="1.3" fill="#fff"/></svg></span><span data-i18n="tab.home">支付</span></button>
+    <button class="tab" data-tab="settings"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" fill="currentColor"/><circle cx="12" cy="12" r="3.2" fill="#fff"/></svg></span><span data-i18n="tab.settings">设置</span></button>
+  </nav>
+
+  <!-- 编辑页（独立视图；todo / note 双模式） -->
+  <section id="view-editor" hidden>
+    <div class="editor-top">
+      <button class="back-btn" id="editor-back" title="返回">‹</button>
+      <button class="btn primary small" id="btn-save" data-i18n="action.save">保存</button>
+    </div>
+    <div class="editor-body">
+      <input id="note-title" class="title-input" type="text" data-i18n-ph="ph.untitled" placeholder="无标题" />
+      <textarea id="note-content" class="content-area" data-i18n-ph="ph.start" placeholder="开始记录…"></textarea>
+      <textarea id="todo-text" class="content-area todo-area" data-i18n-ph="ph.todo" placeholder="待办内容…" hidden></textarea>
+      <textarea id="todo-note" class="content-area todo-note" data-i18n-ph="ph.note" placeholder="补充说明（可选）" hidden></textarea>
+      <button type="button" id="editor-cat" class="cat-select">
+        <span id="editor-cat-name" class="cat-select-name"></span>
+        <svg class="cat-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="editor-count" id="editor-count"></div>
+      <div class="btn-row" id="editor-export-row">
+        <button class="btn danger" id="btn-delete" data-i18n="action.delete">删除</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 分类管理抽屉 -->
+  <div id="cat-manager" hidden>
+    <div class="drawer-mask" id="cm-mask"></div>
+    <div class="drawer">
+      <h3 data-i18n="drawer.catManage">分类管理</h3>
+      <div class="cm-add">
+        <input id="cm-input" type="text" data-i18n-ph="ph.newCat" placeholder="输入新分类名称" />
+        <button class="btn primary small" id="cm-add-btn" data-i18n="drawer.add">添加</button>
+      </div>
+      <div class="cm-list" id="cm-list"></div>
+      <button class="btn" id="cm-close" data-i18n="drawer.done">完成</button>
+    </div>
+  </div>
+  <!-- 应用内弹窗 -->
+  <div id="modal" hidden>
+    <div class="modal-mask" id="modal-mask"></div>
+    <div class="modal">
+      <h4 class="modal-title" id="modal-title"></h4>
+      <p class="modal-msg" id="modal-msg" hidden></p>
+      <input class="modal-input" id="modal-input" hidden type="text" />
+      <div class="modal-actions">
+        <button class="btn" id="modal-cancel" data-i18n="modal.cancel">取消</button>
+        <button class="btn primary" id="modal-ok" data-i18n="modal.confirm">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分类选择弹层 -->
+  <div id="cat-picker" hidden>
+    <div class="drawer-mask" id="cp-mask"></div>
+    <div class="drawer">
+      <h3 data-i18n="drawer.chooseCat">选择分类</h3>
+      <div class="cm-list" id="cp-list"></div>
+      <button class="btn" id="cp-close" data-i18n="modal.cancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+const $=(s)=>document.querySelector(s);
+const TODOS_KEY="notes-app-v1-todos";
+const NOTES_KEY="notes-app-v1-notes";
+const WORK_KEY="notes-app-v1-work";
+const OLD_KEY="notes-app-v1";
+const CATS_KEY="notes-app-v1-cats";
+const ORDER_KEY="notes-app-v1-order";
+const RETIRED_KEY="notes-app-v1-retired";
+const APP_NAME="EWP";
+const APP_VERSION="2.17";
+const PRESET_CATS=["生活","家庭","工作","理财"];
+const EXEC_CATS=["个人","家庭"];
+const WORK_CATS=["个人","公司"];
+
+const ALL_CAT="__all__";
+const LANG_KEY="notes-app-v1-lang";
+const I18N={
+  zh:{
+    "tab.notes":"执行","tab.work":"工作","tab.home":"支付","tab.settings":"设置",
+    "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
+    "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
+    "setting.language":"语言","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
+    "cat.all":"总览","cat.uncat":"未分类",
+    "empty.homeAll":"暂无待办","empty.homeCat":"该分类暂无待办",
+    "empty.notesAll":"还没有执行记录，点右上角 ＋ 新建","empty.notesCat":"该分类暂无执行记录",
+    "empty.workAll":"还没有工作记录，点右上角 ＋ 新建","empty.workCat":"该分类暂无工作记录",
+    "card.untitled":"无标题","card.noBody":"（无正文）",
+    "toast.storage":"本地存储空间不足，部分内容可能未保存","toast.empty":"内容为空，未保存","toast.saved":"已保存","toast.deleted":"已删除",
+    "toast.nfTodo":"未找到该待办","toast.nfNote":"未找到该笔记","toast.nfWork":"未找到该工作记录",
+    "toast.nameEmpty":"名称不能为空","toast.catExists":"该分类已存在","toast.oneCat":"至少保留一个分类",
+    "toast.renamed":"已修改","toast.catDeleted":"已删除分类","toast.catAdded":"已添加分类","toast.exported":"已导出全部数据","toast.cleared":"已清空","toast.imported":"已导入备份","toast.badBackup":"备份文件无效",
+    "modal.confirm":"确定","modal.cancel":"取消","modal.leave":"离开","modal.clear":"清空",
+    "modal.import":"导入备份","modal.importMsg":"导入将覆盖当前本地全部记录，确定继续？",
+    "modal.delTodo":"删除待办","modal.delWork":"删除工作记录","modal.delNote":"删除笔记","modal.delConfirm":"确定删除这条记录？此操作不可恢复。",
+    "modal.renameCat":"修改分类","modal.delCat":"删除分类","modal.delCatMsg":"删除分类「{c}」？其下记录将归入「{f}」。",
+    "modal.discard":"放弃修改","modal.discardMsg":"有未保存的修改，确定离开？",
+    "modal.clearData":"清空数据","modal.clearMsg":"确定清空本地全部记录？此操作不可恢复。",
+    "drawer.catManage":"分类管理","drawer.add":"添加","drawer.done":"完成","drawer.chooseCat":"选择分类"
+  },
+  en:{
+    "tab.notes":"Execute","tab.work":"Work","tab.home":"Pay","tab.settings":"Settings",
+    "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
+    "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
+    "setting.language":"Language","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
+    "cat.all":"Overview","cat.uncat":"Uncategorized",
+    "empty.homeAll":"No todos yet","empty.homeCat":"No todos in this category",
+    "empty.notesAll":"No tasks yet. Tap ＋ top right to add","empty.notesCat":"No tasks in this category",
+    "empty.workAll":"No work records yet. Tap ＋ top right to add","empty.workCat":"No work records in this category",
+    "card.untitled":"Untitled","card.noBody":"(no content)",
+    "toast.storage":"Storage full; some changes may not be saved","toast.empty":"Nothing to save","toast.saved":"Saved","toast.deleted":"Deleted",
+    "toast.nfTodo":"Todo not found","toast.nfNote":"Note not found","toast.nfWork":"Work record not found",
+    "toast.nameEmpty":"Name cannot be empty","toast.catExists":"Category already exists","toast.oneCat":"Keep at least one category",
+    "toast.renamed":"Renamed","toast.catDeleted":"Category deleted","toast.catAdded":"Category added","toast.exported":"All data exported","toast.cleared":"Cleared","toast.imported":"Backup imported","toast.badBackup":"Invalid backup file",
+    "modal.confirm":"OK","modal.cancel":"Cancel","modal.leave":"Leave","modal.clear":"Clear",
+    "modal.import":"Import backup","modal.importMsg":"Importing will overwrite all current local records. Continue?",
+    "modal.delTodo":"Delete todo","modal.delWork":"Delete work record","modal.delNote":"Delete note","modal.delConfirm":"Delete this record? This cannot be undone.",
+    "modal.renameCat":"Rename category","modal.delCat":"Delete category","modal.delCatMsg":"Delete category \"{c}\"? Its records will move to \"{f}\".",
+    "modal.discard":"Discard changes","modal.discardMsg":"You have unsaved changes. Leave anyway?",
+    "modal.clearData":"Clear data","modal.clearMsg":"Delete all local records? This cannot be undone.",
+    "drawer.catManage":"Categories","drawer.add":"Add","drawer.done":"Done","drawer.chooseCat":"Choose category"
+  }
+};
+function t(key,vars){
+  const lang=state.lang||"zh";
+  let s=(I18N[lang]&&I18N[lang][key])||I18N.zh[key]||key;
+  if(vars)for(const k in vars)s=s.replace("{"+k+"}",vars[k]);
+  return s;
+}
+const state={
+  todos:[], notes:[], workNotes:[], customCats:[], catOrder:[], retired:[],
+  currentKind:null, currentId:null, currentItem:null,
+  draft:{category:""},
+  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, dirty:false, editorFrom:"notes",
+  lang:(load(LANG_KEY)||"zh")
+};
+
+/* ---------- 存储 ---------- */
+function load(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){toast(t("toast.storage"));}}
+const loadTodos=()=>load(TODOS_KEY)||[];
+const loadNotes=()=>load(NOTES_KEY)||[];
+const loadWork=()=>load(WORK_KEY)||[];
+const persistTodos=()=>save(TODOS_KEY,state.todos);
+const persistNotes=()=>save(NOTES_KEY,state.notes);
+const persistWork=()=>save(WORK_KEY,state.workNotes);
+const loadCats=()=>load(CATS_KEY)||[];
+const persistCats=()=>save(CATS_KEY,state.customCats);
+const loadOrder=()=>load(ORDER_KEY)||[];
+const persistOrder=()=>save(ORDER_KEY,state.catOrder);
+const loadRetired=()=>load(RETIRED_KEY)||[];
+const persistRetired=()=>save(RETIRED_KEY,state.retired);
+
+/* ---------- 工具 ---------- */
+function toast(msg){const el=$("#toast");el.textContent=msg;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,1800);}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function textFromHtml(h){const d=document.createElement("div");d.innerHTML=h||"";return(d.textContent||"").trim();}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+/* ---------- 语言 ---------- */
+function applyStaticText(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.dataset.i18n);});
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{el.placeholder=t(el.dataset.i18nPh);});
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{el.title=t(el.dataset.i18nTitle);});
+  document.querySelectorAll("#lang-switch .lang-opt").forEach(b=>b.classList.toggle("active",b.dataset.lang===state.lang));
+}
+function setLang(lang){
+  if(lang!=="zh"&&lang!=="en")lang="zh";
+  state.lang=lang; save(LANG_KEY,lang);
+  applyStaticText(); renderAll(); switchTab(state.tab);
+}
+
+/* ---------- 应用内弹窗 ---------- */
+let modalResolve=null;
+function openModal(opts){
+  return new Promise(resolve=>{
+    modalResolve=resolve;
+    const m=$("#modal");
+    $("#modal-title").textContent=opts.title||"";
+    const msg=$("#modal-msg");
+    if(opts.message){msg.textContent=opts.message;msg.hidden=false;}else msg.hidden=true;
+    const inp=$("#modal-input");
+    if(opts.showInput){inp.value=opts.initial||"";inp.placeholder=opts.placeholder||"";inp.hidden=false;setTimeout(()=>inp.focus(),60);}else inp.hidden=true;
+    const ok=$("#modal-ok");
+    ok.classList.toggle("danger-ok",!!opts.danger);
+    ok.textContent=opts.okText||t("modal.confirm");
+    m.hidden=false;
+    const done=(val)=>{m.hidden=true;const r=modalResolve;modalResolve=null;if(r)r(val);};
+    ok.onclick=()=>{ if(opts.showInput) done(inp.value.trim()); else done(true); };
+    $("#modal-cancel").onclick=()=>done(opts.showInput?null:false);
+    $("#modal-mask").onclick=()=>done(opts.showInput?null:false);
+    if(opts.showInput) inp.onkeydown=e=>{ if(e.key==="Enter") ok.click(); };
+  });
+}
+const modalConfirm=(title,message,opts={})=>openModal({title,message,showInput:false,...opts});
+const modalPrompt=(title,initial,placeholder)=>openModal({title,showInput:true,initial,placeholder});
+
+/* ---------- 分类 ---------- */
+function categories(){
+  const merged=PRESET_CATS.filter(c=>!state.retired.includes(c));
+  state.customCats.forEach(c=>{if(!merged.includes(c))merged.push(c);});
+  state.todos.forEach(t=>{if(t.category&&!merged.includes(t.category))merged.push(t.category);});
+  return merged;
+}
+function orderedCats(){
+  const merged=categories();
+  const order=(state.catOrder||[]).filter(c=>merged.includes(c));
+  const rest=merged.filter(c=>!order.includes(c));
+  return [...order,...rest];
+}
+function editorCats(){
+  if(state.currentKind==="work") return WORK_CATS;
+  if(state.currentKind==="note") return EXEC_CATS;
+  return orderedCats();
+}
+function ensureValidCat(){
+  if(state.filterCat===ALL_CAT) return;
+  const cats=categories();
+  if(!cats.includes(state.filterCat)) state.filterCat=ALL_CAT;
+}
+const CAT_SVG={
+  "生活":`<path d="M5 19C5 9 13 5 19 5c0 8-4 14-12 14"/><path d="M5 19c3-4 6-7 10-9"/>`,
+  "家庭":`<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="16.8" cy="9" r="2.4"/>`,
+  "工作":`<rect x="3.5" y="5" width="17" height="11" rx="2"/><path d="M9 20.5h6M12 16v4.5"/>`,
+  "理财":`<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.3 9.6h4.2a1.7 1.7 0 0 1 0 3.4h-3a1.7 1.7 0 0 0 0 3.4h4.2"/>`,
+  "个人":`<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/>`,
+  "公司":`<rect x="5" y="4.5" width="14" height="15.5" rx="1"/><path d="M9 8.5h1.5M13.5 8.5H15M9 12h1.5M13.5 12H15M9 15.5h1.5M13.5 15.5H15"/>`
+};
+function catIcon(c){
+  const inner=CAT_SVG[c]||`<path d="M3.5 6.5h5l2 2.5h10V19H3.5z"/>`;
+  return `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+}
+
+/* ---------- 卡片 ---------- */
+function cardHtml(n,hideCat){
+  return `<div class="nc-title ${n.title?"":"empty"}">${esc(n.title||t("card.untitled"))}</div>
+    <div class="nc-summary">${esc(textFromHtml(n.content))||t("card.noBody")}</div>`
+    +((!hideCat&&n.category)?`<div class="nc-cat">${esc(n.category)}</div>`:"");
+}
+function bindCard(box,n,onClick,persistFn,idx,overview,cat){
+  overview=!!overview;
+  const card=document.createElement("div");
+  card.className="note-card"+(overview||idx===0?" first":"")+(overview?" overview":"")+(n.done?" done":"");
+  const left=overview
+    ? `<span class="nc-cat-label">${esc(cat||t("cat.uncat"))}</span>`
+    : `<span class="nc-index">${idx+1}</span>`;
+  const check=overview?"":`<input type="checkbox" ${n.done?"checked":""}/>`;
+  card.innerHTML=`
+    ${left}
+    <div class="nc-body">${cardHtml(n,overview)}</div>
+    ${check}`;
+  const cb=card.querySelector("input");
+  if(cb) cb.addEventListener("change",e=>{
+    n.done=e.target.checked; persistFn(); renderAll();
+  });
+  card.addEventListener("click",e=>{ if(e.target.tagName!=="INPUT") onClick(n); });
+  box.appendChild(card);
+}
+
+/* ---------- 渲染 ---------- */
+const GRIP_SVG=`<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>`;
+function renderCatBar(){
+  const bar=$("#cat-bar"); bar.innerHTML="";
+  const all=document.createElement("button");
+  all.className="cat-item no-icon"+(state.filterCat===ALL_CAT?" active":"");
+  all.innerHTML=`<span class="cat-name">${t("cat.all")}</span>`;
+  all.title=t("cat.all");
+  all.addEventListener("click",()=>{state.filterCat=ALL_CAT;renderCatBar();renderHomeList();});
+  bar.appendChild(all);
+  orderedCats().forEach(c=>{
+    const b=document.createElement("button");
+    b.className="cat-item"+(state.filterCat===c?" active":"");
+    b.innerHTML=`<span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${esc(c)}</span>`;
+    b.title=c;
+    b.addEventListener("click",()=>{state.filterCat=c;renderCatBar();renderHomeList();});
+    bar.appendChild(b);
+  });
+}
+function setupSortable(container,{gripSel,itemSel,dataAttr,onReorder}={}){
+  let drag=null, suppressClick=false;
+  container.addEventListener("pointerdown",e=>{
+    const grip=e.target.closest(gripSel);
+    const item=e.target.closest(itemSel);
+    if(!grip||!item)return;
+    e.preventDefault();
+    drag={item,startY:e.clientY,dragging:false,moved:false};
+    try{grip.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  container.addEventListener("pointermove",e=>{
+    if(!drag)return;
+    if(!drag.dragging){
+      if(Math.abs(e.clientY-drag.startY)>8){drag.dragging=true;drag.moved=true;drag.item.classList.add("dragging");}
+      else return;
+    }
+    const others=[...container.querySelectorAll(itemSel+":not(.dragging)")];
+    let after=null;
+    for(const o of others){
+      const r=o.getBoundingClientRect();
+      if(e.clientY>r.top+r.height/2) after=o; else break;
+    }
+    if(after) container.insertBefore(drag.item, after.nextSibling);
+    else container.insertBefore(drag.item, others[0]);
+  });
+  const end=()=>{
+    if(!drag)return;
+    const wasMoved=drag.moved;
+    if(drag.dragging){
+      const order=[...container.querySelectorAll(itemSel)].map(el=>el.dataset[dataAttr]);
+      onReorder(order);
+    }else{
+      drag.item.classList.remove("dragging");
+    }
+    drag=null;
+    if(wasMoved) suppressClick=true;
+  };
+  container.addEventListener("pointerup",end);
+  container.addEventListener("pointercancel",end);
+  container.addEventListener("click",e=>{
+    if(suppressClick){suppressClick=false;e.stopPropagation();e.preventDefault();}
+  },true);
+}
+function renderHomeList(){
+  ensureValidCat();
+  const sortFn=(a,b)=>Number(a.done)-Number(b.done)||b.updated_at.localeCompare(a.updated_at);
+  let rows;
+  if(state.filterCat===ALL_CAT){
+    const byCat={};
+    state.todos.forEach(td=>{const c=td.category||t("cat.uncat");(byCat[c]=byCat[c]||[]).push(td);});
+    rows=[];
+    orderedCats().forEach(c=>{
+      const arr=(byCat[c]||[]).slice().sort(sortFn);
+      if(arr[0]) rows.push({t:arr[0],cat:c});
+    });
+    Object.keys(byCat).forEach(c=>{
+      if(!orderedCats().includes(c)){const arr=byCat[c].slice().sort(sortFn); if(arr[0]) rows.push({t:arr[0],cat:c});}
+    });
+  }else{
+    rows=state.todos.filter(t=>t.category===state.filterCat).sort(sortFn).map(t=>({t,cat:t.category}));
+  }
+  const box=$("#home-list"); box.innerHTML="";
+  if(!rows.length){box.innerHTML=`<div class="empty-tip">${state.filterCat===ALL_CAT?t("empty.homeAll"):t("empty.homeCat")}</div>`;return;}
+  const overview=state.filterCat===ALL_CAT;
+  rows.forEach(({t,cat},idx)=>{
+    const row=document.createElement("div");
+    row.className="todo-row"+(overview?" overview":"")+(t.done?" done":"")+((overview||idx===0)?" first":"");
+    const left=overview
+      ? `<span class="tr-cat">${esc(cat)}</span>`
+      : `<span class="tr-index">${idx+1}</span>`;
+    const check=overview?"":`<input type="checkbox" ${t.done?"checked":""}/>`;
+    row.innerHTML=`
+      ${left}
+      <div class="tr-body"><div class="tr-text">${esc(t.text)}</div>${t.note?`<div class="tr-note">${esc(t.note)}</div>`:""}</div>
+      ${check}`;
+    const boxInput=row.querySelector("input");
+    if(boxInput) boxInput.addEventListener("change",e=>{
+      t.done=e.target.checked; persistTodos(); renderHomeList();
+    });
+    row.addEventListener("click",e=>{ if(e.target.tagName!=="INPUT") openTodo(t); });
+    box.appendChild(row);
+  });
+}
+function renderSideBar(barId,cats,filterKey,listRender){
+  const bar=$(barId); bar.innerHTML="";
+  const all=document.createElement("button");
+  all.className="cat-item no-icon"+(state[filterKey]===ALL_CAT?" active":"");
+  all.innerHTML=`<span class="cat-name">${t("cat.all")}</span>`;
+  all.title=t("cat.all");
+  all.addEventListener("click",()=>{state[filterKey]=ALL_CAT;renderSideBar(barId,cats,filterKey,listRender);listRender();});
+  bar.appendChild(all);
+  cats.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="cat-item"+(state[filterKey]===c?" active":"");
+    b.innerHTML=`<span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${esc(c)}</span>`;
+    b.title=c;
+    b.addEventListener("click",()=>{state[filterKey]=c;renderSideBar(barId,cats,filterKey,listRender);listRender();});
+    bar.appendChild(b);
+  });
+}
+function groupFirst(list,cats,sortFn){
+  const byCat={};
+  list.forEach(it=>{const c=it.category||t("cat.uncat");(byCat[c]=byCat[c]||[]).push(it);});
+  const rows=[];
+  cats.forEach(c=>{const arr=(byCat[c]||[]).slice().sort(sortFn); if(arr[0]) rows.push({it:arr[0],cat:c});});
+  Object.keys(byCat).forEach(c=>{if(!cats.includes(c)){const arr=byCat[c].slice().sort(sortFn); if(arr[0]) rows.push({it:arr[0],cat:c});}});
+  return rows;
+}
+function renderNotesList(){
+  const f=state.notesFilter;
+  const sortFn=(a,b)=>Number(a.done)-Number(b.done)||b.updated_at.localeCompare(a.updated_at);
+  const box=$("#notes-list"); box.innerHTML="";
+  let rows;
+  if(f===ALL_CAT){ rows=groupFirst(state.notes,EXEC_CATS,sortFn); }
+  else{ rows=state.notes.filter(n=>n.category===f).sort(sortFn).map(n=>({it:n,cat:n.category})); }
+  if(!rows.length){box.innerHTML=`<div class="empty-tip">${f===ALL_CAT?t("empty.notesAll"):t("empty.notesCat")}</div>`;return;}
+  const overview=f===ALL_CAT;
+  rows.forEach(({it,cat},idx)=>bindCard(box,it,openNote,persistNotes,idx,overview,cat));
+}
+function renderWorkList(){
+  const f=state.workFilter;
+  const sortFn=(a,b)=>Number(a.done)-Number(b.done)||b.updated_at.localeCompare(a.updated_at);
+  const box=$("#work-list"); box.innerHTML="";
+  let rows;
+  if(f===ALL_CAT){ rows=groupFirst(state.workNotes,WORK_CATS,sortFn); }
+  else{ rows=state.workNotes.filter(w=>w.category===f).sort(sortFn).map(w=>({it:w,cat:w.category})); }
+  if(!rows.length){box.innerHTML=`<div class="empty-tip">${f===ALL_CAT?t("empty.workAll"):t("empty.workCat")}</div>`;return;}
+  const overview=f===ALL_CAT;
+  rows.forEach(({it,cat},idx)=>bindCard(box,it,openWork,persistWork,idx,overview,cat));
+}
+function renderAll(){
+  renderCatBar(); renderHomeList();
+  renderSideBar("#notes-cat-bar",EXEC_CATS,"notesFilter",renderNotesList);
+  renderSideBar("#work-cat-bar",WORK_CATS,"workFilter",renderWorkList);
+  renderNotesList(); renderWorkList();
+}
+
+/* ---------- 视图路由 ---------- */
+const TITLE_KEY={home:"tab.home",notes:"tab.notes",work:"tab.work",settings:"tab.settings"};
+function switchTab(tab){
+  state.tab=tab;
+  ["home","notes","work","settings"].forEach(t=>$("#view-"+t).hidden=t!==tab);
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+  $("#top-title").textContent=t(TITLE_KEY[tab]);
+  $("#top-action").style.display = tab==="home" ? "flex" : "none";
+  $("#top-add").style.display = (tab==="home"||tab==="notes"||tab==="work") ? "flex" : "none";
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+
+$("#top-action").addEventListener("click",openCatManager);
+$("#top-add").addEventListener("click",()=>{ if(state.tab==="notes") newNote(); else if(state.tab==="work") newWork(); else newTodo(); });
+
+/* ---------- 编辑器 ---------- */
+function renderCatSelect(){
+  $("#editor-cat-name").textContent=state.draft.category||categories()[0]||"";
+}
+function openCatPicker(){ renderCpList(); $("#cat-picker").hidden=false; }
+function closeCatPicker(){ $("#cat-picker").hidden=true; }
+function renderCpList(){
+  const box=$("#cp-list"); box.innerHTML="";
+  editorCats().forEach(c=>{
+    const li=document.createElement("div");
+    li.className="cp-item"+(state.draft.category===c?" active":"");
+    li.innerHTML=`<span class="cp-name">${esc(c)}</span><svg class="cp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
+    li.addEventListener("click",()=>{ state.draft.category=c; renderCatSelect(); closeCatPicker(); });
+    box.appendChild(li);
+  });
+}
+function applyEditorMode(){
+  const todo=state.currentKind==="todo";
+  $("#note-title").hidden=true;
+  $("#note-content").hidden=true;
+  $("#todo-text").hidden=false;
+  $("#todo-note").hidden=false;
+  $("#editor-cat").hidden=false;
+  $("#editor-count").hidden=true;
+  $("#todo-text").placeholder=todo?t("ph.todo"):t("ph.record");
+}
+function fillTodo(todo){
+  $("#todo-text").value=todo.text||"";
+  $("#todo-note").value=todo.note||"";
+  const def=state.filterCat===ALL_CAT?categories()[0]:state.filterCat;
+  state.draft.category=todo.category||def||categories()[0]||"";
+  renderCatSelect();
+}
+function fillNote(n){
+  $("#todo-text").value=n.title||"";
+  $("#todo-note").value=textFromHtml(n.content)||"";
+  const cats=state.currentKind==="work"?WORK_CATS:EXEC_CATS;
+  state.draft.category=n.category||cats[0]||"";
+  renderCatSelect();
+}
+function openEditor(){
+  state.editorFrom=state.tab;
+  ["home","notes","work","settings"].forEach(t=>$("#view-"+t).hidden=true);
+  $("#main-topbar").hidden=true;
+  $("#main-tabbar").hidden=true;
+  $("#view-editor").hidden=false;
+}
+function closeEditor(){
+  $("#view-editor").hidden=true;
+  $("#main-topbar").hidden=false;
+  $("#main-tabbar").hidden=false;
+  switchTab(state.editorFrom||"notes");
+}
+
+function openTodo(todo){
+  if(!todo){ toast(t("toast.nfTodo")); return; }
+  state.currentKind="todo"; state.currentId=todo.id; state.currentItem=todo;
+  fillTodo(todo); applyEditorMode(); openEditor();
+}
+function openNote(n){
+  if(!n){ toast(t("toast.nfNote")); return; }
+  state.currentKind="note"; state.currentId=n.id; state.currentItem=n;
+  fillNote(n); applyEditorMode(); openEditor();
+}
+function openWork(w){
+  if(!w){ toast(t("toast.nfWork")); return; }
+  state.currentKind="work"; state.currentId=w.id; state.currentItem=w;
+  fillNote(w); applyEditorMode(); openEditor();
+}
+function newTodo(){
+  state.currentKind="todo"; state.currentId=null; state.currentItem=null;
+  fillTodo({text:"",category:state.filterCat===ALL_CAT?"":state.filterCat});
+  applyEditorMode(); openEditor(); $("#todo-text").focus();
+}
+function newNote(){
+  state.currentKind="note"; state.currentId=null; state.currentItem=null;
+  fillNote({title:"",content:""});
+  applyEditorMode(); openEditor(); $("#todo-text").focus();
+}
+function newWork(){
+  state.currentKind="work"; state.currentId=null; state.currentItem=null;
+  fillNote({title:"",content:""});
+  applyEditorMode(); openEditor(); $("#todo-text").focus();
+}
+
+function persist(showToastMsg){
+  const todoCat=state.draft.category||categories()[0]||t("cat.uncat");
+  const ts=new Date().toISOString().slice(0,19);
+  if(state.currentKind==="todo"){
+    const text=$("#todo-text").value.trim();
+    const note=$("#todo-note").value.trim();
+    if(!text){if(showToastMsg)toast(t("toast.empty"));return false;}
+    if(state.currentId===null||!state.currentItem){
+      const t={id:uid(),text,note,category:todoCat,done:false,created_at:ts,updated_at:ts};
+      state.todos.unshift(t); state.currentId=t.id; state.currentItem=t;
+    }else{
+      let idx=state.todos.indexOf(state.currentItem);
+      if(idx<0) idx=state.todos.findIndex(x=>x.id===state.currentId);
+      if(idx>=0){ state.todos[idx]={...state.todos[idx],text,note,category:todoCat,updated_at:ts}; state.currentItem=state.todos[idx]; }
+    }
+    persistTodos();
+  }else{
+    const title=$("#todo-text").value.trim();
+    const content=$("#todo-note").value;
+    if(!title&&!content.trim()){if(showToastMsg)toast(t("toast.empty"));return false;}
+    const isWork=state.currentKind==="work";
+    const table=isWork?state.workNotes:state.notes;
+    const persistTable=isWork?persistWork:persistNotes;
+    const cats=isWork?WORK_CATS:EXEC_CATS;
+    const cat=state.draft.category||cats[0]||"";
+    if(state.currentId===null||!state.currentItem){
+      const n={id:uid(),title,content,category:cat,done:false,created_at:ts,updated_at:ts};
+      table.unshift(n); state.currentId=n.id; state.currentItem=n;
+    }else{
+      let idx=table.indexOf(state.currentItem);
+      if(idx<0) idx=table.findIndex(x=>x.id===state.currentId);
+      if(idx>=0){ table[idx]={...table[idx],title,content,category:cat,updated_at:ts}; state.currentItem=table[idx]; }
+    }
+    persistTable();
+  }
+  renderAll(); state.dirty=false;
+  if(showToastMsg)toast(t("toast.saved"));
+  return true;
+}
+async function deleteCurrent(){
+  if(state.currentId===null&&!state.currentItem)return;
+  const isTodo=state.currentKind==="todo";
+  const isWork=state.currentKind==="work";
+  const label=isTodo?t("modal.delTodo"):(isWork?t("modal.delWork"):t("modal.delNote"));
+  const ok=await modalConfirm(label,t("modal.delConfirm"),{danger:true,okText:t("action.delete")});
+  if(!ok)return;
+  if(isTodo){
+    state.todos=state.todos.filter(x=>x!==state.currentItem); persistTodos();
+  }else if(isWork){
+    state.workNotes=state.workNotes.filter(x=>x!==state.currentItem); persistWork();
+  }else{
+    state.notes=state.notes.filter(x=>x!==state.currentItem); persistNotes();
+  }
+  state.currentId=null; state.currentItem=null; state.currentKind=null;
+  renderAll(); closeEditor(); toast(t("toast.deleted"));
+}
+
+/* ---------- 分类管理 ---------- */
+function openCatManager(){ $("#cat-manager").hidden=false; renderCatManager(); }
+function closeCatManager(){ $("#cat-manager").hidden=true; }
+
+function renderCatManager(){
+  const list=$("#cm-list"); list.innerHTML="";
+  orderedCats().forEach(c=>{
+    const li=document.createElement("div");
+    li.className="cm-item";
+    li.dataset.cat=c;
+    li.innerHTML=`<span class="cm-grip">${GRIP_SVG}</span><span class="cm-name">${esc(c)}</span>
+      <button class="rename" title="${t("action.rename")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m13.5 6.5 3 3"/></svg></button>
+      <button class="del" title="${t("action.delete")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2M6.5 7l1 12h9l1-12"/><path d="M10 11v5M14 11v5"/></svg></button>`;
+    li.querySelector(".rename").addEventListener("click",async()=>{
+      const name=await modalPrompt(t("modal.renameCat"),c,t("ph.renameCat"));
+      if(name===null)return;
+      if(name===c)return;
+      if(!name)return toast(t("toast.nameEmpty"));
+      if(categories().includes(name))return toast(t("toast.catExists"));
+      state.notes.forEach(n=>{if(n.category===c)n.category=name;});
+      state.todos.forEach(t=>{if(t.category===c)t.category=name;});
+      if(PRESET_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
+      else state.customCats=state.customCats.filter(x=>x!==c);
+      if(!PRESET_CATS.includes(name)){ if(!state.customCats.includes(name))state.customCats.push(name); }
+      state.retired=state.retired.filter(x=>x!==name);
+      state.catOrder=state.catOrder.map(x=>x===c?name:x);
+      if(state.filterCat===c)state.filterCat=name;
+      persistRetired(); persistCats(); persistOrder(); persistTodos(); persistNotes(); renderAll(); renderCatManager(); toast(t("toast.renamed"));
+    });
+    li.querySelector(".del").addEventListener("click",async()=>{
+      const cats=categories();
+      if(cats.length<=1)return toast(t("toast.oneCat"));
+      const fallback=cats[0]===c?cats[1]:cats[0];
+      const ok=await modalConfirm(t("modal.delCat"),t("modal.delCatMsg",{c,f:fallback}),{danger:true,okText:t("action.delete")});
+      if(!ok)return;
+      state.notes.forEach(n=>{if(n.category===c)n.category=fallback;});
+      state.todos.forEach(t=>{if(t.category===c)t.category=fallback;});
+      if(PRESET_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
+      else state.customCats=state.customCats.filter(x=>x!==c);
+      state.catOrder=state.catOrder.filter(x=>x!==c);
+      if(state.filterCat===c)state.filterCat=fallback;
+      persistRetired(); persistOrder(); persistCats(); persistTodos(); persistNotes(); renderAll(); renderCatManager(); toast(t("toast.catDeleted"));
+    });
+    list.appendChild(li);
+  });
+}
+
+$("#cm-add-btn").addEventListener("click",()=>{
+  const input=$("#cm-input"); const name=input.value.trim();
+  if(!name)return toast(t("toast.nameEmpty"));
+  if(categories().includes(name))return toast(t("toast.catExists"));
+  if(!state.customCats.includes(name))state.customCats.push(name);
+  if(!state.catOrder.includes(name))state.catOrder.push(name);
+  state.filterCat=name;
+  persistOrder(); persistCats(); persistTodos(); persistNotes(); input.value=""; renderAll(); renderCatManager(); toast(t("toast.catAdded"));
+});
+$("#cm-input").addEventListener("keydown",e=>{if(e.key==="Enter")$("#cm-add-btn").click();});
+$("#cm-mask").addEventListener("click",closeCatManager);
+$("#cm-close").addEventListener("click",closeCatManager);
+
+function downloadJson(){
+  const blob=new Blob([JSON.stringify({todos:state.todos,notes:state.notes,workNotes:state.workNotes},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes-backup.json";a.click();URL.revokeObjectURL(a.href);
+  toast(t("toast.exported"));
+}
+function importBackup(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    let data;
+    try{data=JSON.parse(reader.result);}catch(e){toast(t("toast.badBackup"));return;}
+    if(!data||!Array.isArray(data.todos)||!Array.isArray(data.notes)||!Array.isArray(data.workNotes)){toast(t("toast.badBackup"));return;}
+    const ok=await modalConfirm(t("modal.import"),t("modal.importMsg"),{okText:t("setting.import")});
+    if(!ok)return;
+    const ts=new Date().toISOString().slice(0,19);
+    state.todos=data.todos.map(x=>({id:x.id||uid(),text:x.text||"",note:x.note||"",category:x.category||PRESET_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
+    state.notes=data.notes.map(x=>({id:x.id||uid(),title:x.title||"",content:x.content||"",category:EXEC_CATS.includes(x.category)?x.category:EXEC_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
+    state.workNotes=data.workNotes.map(x=>({id:x.id||uid(),title:x.title||"",content:x.content||"",category:WORK_CATS.includes(x.category)?x.category:WORK_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
+    persistTodos();persistNotes();persistWork();
+    renderAll(); toast(t("toast.imported"));
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- 示例种子数据 ---------- */
+function seedTodos(){
+  const now=Date.now();
+  const ts=(min)=>new Date(now-min*60000).toISOString().slice(0,19);
+  const t=(text,category,done,min)=>({id:uid(),text,category,done:!!done,created_at:ts(min),updated_at:ts(min)});
+  return [
+    t("买牛奶","生活",false,120), t("买面包","生活",false,120), t("买鸡蛋","生活",true,120),
+    t("晨跑 3 公里","生活",false,200), t("记录体重","生活",false,200),
+    t("缴水电费","家庭",false,300), t("整理缴费凭证","家庭",true,300), t("周日通话","家庭",false,360),
+    t("整理本周数据","工作",false,90), t("撰写周报总结","工作",false,90), t("同步纪要给团队","工作",true,420),
+    t("核对各类开销","理财",false,500)
+  ];
+}
+function seedNotes(){
+  const now=Date.now();
+  const ts=(min)=>new Date(now-min*60000).toISOString().slice(0,19);
+  const n=(title,content,category,min)=>({id:uid(),title,category,content,created_at:ts(min),updated_at:ts(min)});
+  return [
+    n("周末采购清单","周末去一趟超市，把冰箱和日用品补齐。","个人",120),
+    n("健身计划","本周目标：晨跑三次，每次三公里，睡前拉伸。","个人",200),
+    n("家庭账单整理","核对本月水电燃气费，记得按时缴费。","家庭",300),
+    n("给爸妈打电话","周日晚上给爸妈通个电话，聊聊近况。","家庭",360),
+    n("项目周报草稿","本周进展：完成接口联调，下周进入测试阶段。","个人",90),
+    n("产品评审会议纪要","评审结论：首页分类调整方案通过，排期到下个迭代。","个人",420),
+    n("月度记账复盘","复盘本月收支，看看哪些开销可以压缩。","个人",500),
+    n("基金定投记录","记录本月定投金额与持仓情况，长期持有。","个人",600)
+  ];
+}
+function seedWork(){
+  const now=Date.now();
+  const ts=(min)=>new Date(now-min*60000).toISOString().slice(0,19);
+  const w=(title,content,category,min)=>({id:uid(),title,category,content,created_at:ts(min),updated_at:ts(min)});
+  return [
+    w("项目排期确认","对齐下个迭代需求范围，确认评审与上线时间节点。","公司",150),
+    w("客户跟进记录","跟进本周客户反馈，整理待答复事项与下次沟通时间。","公司",260),
+    w("周报汇总要点","汇总本周完成事项、风险与下周计划，同步给团队。","个人",380)
+  ];
+}
+
+/* ---------- 绑定 ---------- */
+function bind(){
+  $("#btn-save").addEventListener("click",()=>{ if(persist(true)) closeEditor(); });
+  $("#editor-back").addEventListener("click",async()=>{
+    if(state.dirty){
+      const ok=await modalConfirm(t("modal.discard"),t("modal.discardMsg"),{okText:t("modal.leave")});
+      if(!ok)return;
+    }
+    closeEditor();
+  });
+  $("#btn-delete").addEventListener("click",deleteCurrent);
+  $("#btn-export-all").addEventListener("click",downloadJson);
+  $("#btn-import-all").addEventListener("click",()=>$("#import-file").click());
+  $("#import-file").addEventListener("change",e=>{importBackup(e.target.files[0]);e.target.value="";});
+
+  $("#note-title").addEventListener("input",()=>{state.dirty=true;});
+  $("#note-content").addEventListener("input",()=>{state.dirty=true;});
+  $("#todo-text").addEventListener("input",()=>{state.dirty=true;});
+  $("#todo-note").addEventListener("input",()=>{state.dirty=true;});
+
+  $("#editor-cat").addEventListener("click",openCatPicker);
+  $("#cp-mask").addEventListener("click",closeCatPicker);
+  $("#cp-close").addEventListener("click",closeCatPicker);
+
+  document.querySelectorAll("#lang-switch .lang-opt").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
+}
+
+/* ---------- 启动 ---------- */
+function init(){
+  bind();
+  const old=load(OLD_KEY);
+  const hasNew=localStorage.getItem(TODOS_KEY)||localStorage.getItem(NOTES_KEY);
+  if(old&&old.length&&!hasNew){
+    old.forEach(o=>{
+      (o.todos||[]).forEach(td=>{
+        state.todos.push({id:uid(),text:td.text,category:o.category,done:!!td.done,created_at:o.created_at,updated_at:o.updated_at});
+      });
+      if(o.title||textFromHtml(o.content)){
+        state.notes.push({id:o.id||uid(),title:o.title||"",content:o.content||"",category:o.category,created_at:o.created_at,updated_at:o.updated_at});
+      }
+    });
+    localStorage.removeItem(OLD_KEY);
+    persistTodos(); persistNotes();
+  }else{
+    state.todos=loadTodos(); state.notes=loadNotes(); state.workNotes=loadWork();
+    if(!state.todos.length&&!state.notes.length&&!state.workNotes.length){
+      state.todos=seedTodos(); state.notes=seedNotes(); state.workNotes=seedWork();
+      persistTodos(); persistNotes(); persistWork();
+    }
+  }
+  if(!state.workNotes.length){ state.workNotes=seedWork(); persistWork(); }
+  state.todos.forEach(t=>{if(!t.id)t.id=uid();});
+  state.notes.forEach(n=>{if(!n.id)n.id=uid(); if(n.done===undefined)n.done=false; if(!EXEC_CATS.includes(n.category))n.category=EXEC_CATS[0];});
+  state.workNotes.forEach(w=>{if(!w.id)w.id=uid(); if(w.done===undefined)w.done=false; if(!WORK_CATS.includes(w.category))w.category=WORK_CATS[0];});
+  state.customCats=loadCats();
+  state.catOrder=loadOrder();
+  state.retired=loadRetired();
+  setupSortable($("#cm-list"),{
+    gripSel:".cm-grip",itemSel:".cm-item",dataAttr:"cat",
+    onReorder:order=>{state.catOrder=order;persistOrder();renderCatBar();renderHomeList();renderCatManager();}
+  });
+  ensureValidCat();
+  $("#about-ver").textContent=`${APP_NAME} v${APP_VERSION}`;
+  applyStaticText();
+  renderAll();
+  switchTab("notes");
+}
+init();
+})();
+</script>
+</body>
+</html>

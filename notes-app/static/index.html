@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>记事 · Notes</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>" />
+  <link rel="stylesheet" href="/static/style.css?v=2" />
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="side-head">
+        <h1 class="logo">📝 记事本</h1>
+        <button id="btn-new" class="btn primary">＋ 新建笔记</button>
+      </div>
+
+      <div class="search-box">
+        <input id="search-input" type="text" placeholder="搜索标题 / 正文…" />
+      </div>
+
+      <div class="side-section">
+        <h3>分类</h3>
+        <ul id="category-list" class="cat-list"></ul>
+      </div>
+
+      <div class="side-section">
+        <h3>标签</h3>
+        <div id="tag-cloud" class="tag-cloud"></div>
+      </div>
+
+      <div class="side-foot">
+        <span id="sync-status">● 已离线</span>
+      </div>
+    </aside>
+
+    <!-- 笔记列表 -->
+    <section class="list-pane">
+      <div class="list-head">
+        <span id="list-count"></span>
+      </div>
+      <div id="note-list" class="note-list"></div>
+    </section>
+
+    <!-- 编辑区 -->
+    <main class="editor-pane">
+      <div class="editor-top">
+        <input id="note-title" class="title-input" type="text" placeholder="无标题" />
+        <div class="editor-actions">
+          <button id="btn-save" class="btn">保存</button>
+          <button id="btn-export-md" class="btn" title="导出 Markdown">导出 MD</button>
+          <button id="btn-export-txt" class="btn" title="导出纯文本">导出 TXT</button>
+          <button id="btn-delete" class="btn danger">删除</button>
+        </div>
+      </div>
+
+      <div class="meta-row">
+        <label>分类
+          <input id="note-category" type="text" list="category-datalist" placeholder="未分类" />
+        </label>
+        <label>标签
+          <input id="note-tags" type="text" placeholder="逗号分隔，如：工作, 购物" />
+        </label>
+        <label>提醒时间
+          <input id="note-reminder" type="datetime-local" />
+        </label>
+      </div>
+      <datalist id="category-datalist"></datalist>
+
+      <!-- 富文本工具栏 -->
+      <div class="toolbar">
+        <button type="button" data-cmd="bold" title="加粗"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="斜体"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="下划线"><u>U</u></button>
+        <button type="button" data-cmd="insertUnorderedList" title="无序列表">• 列表</button>
+        <button type="button" data-cmd="insertOrderedList" title="有序列表">1. 列表</button>
+        <button type="button" id="btn-insert-image" title="插入图片">🖼 图片</button>
+        <button type="button" data-cmd="undo" title="撤销">↩ 撤销</button>
+        <button type="button" data-cmd="redo" title="重做">↪ 重做</button>
+        <input id="file-image" type="file" accept="image/*" hidden />
+      </div>
+
+      <div id="note-content" class="content-area" contenteditable="true"
+           placeholder="开始记录…"></div>
+
+      <!-- 待办清单 -->
+      <div class="todo-panel">
+        <div class="todo-head">
+          <h3>待办事项</h3>
+          <button id="btn-add-todo" class="btn small">＋ 添加待办</button>
+        </div>
+        <ul id="todo-list" class="todo-list"></ul>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/static/app.js?v=2"></script>
+</body>
+</html>
