@@ -41,8 +41,7 @@ button{font-family:inherit;cursor:pointer}
 .cat-item .cat-icon svg{width:16px;height:16px;display:block}
 .cat-item .cat-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cat-item.no-icon .cat-name{padding-left:20px;text-align:left}
-.cat-item.cat-all{color:var(--text);font-weight:600}
-.cat-item.cat-all .cat-name{font-size:13px;font-weight:600}
+.cat-item.cat-all .cat-name{font-size:12px}
 .cat-item:hover{background:var(--primary-soft);color:var(--text)}
 .cat-item.active{background:var(--primary-soft);color:var(--text)}
 
@@ -61,7 +60,7 @@ button{font-family:inherit;cursor:pointer}
 .note-card .nc-title.empty{color:var(--muted)}
 .note-card.done .nc-title{text-decoration:line-through;color:var(--muted)}
 .note-card .nc-summary{font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.note-card .nc-cat{font-size:12px;color:var(--primary);font-weight:600;margin-top:5px}
+.note-card .nc-cat{font-size:11px;color:#E8B547;font-weight:400;margin-top:5px}
 .note-card .nc-cat-label{flex-shrink:0;width:64px;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden}
 .note-card.overview.first,.note-card.first{background:var(--panel);border:1.5px solid #E8B547}
 .note-card.overview.first::after,.note-card.first::after{display:none}
@@ -199,7 +198,7 @@ button{font-family:inherit;cursor:pointer}
 .todo-row.done{background:var(--done-soft)}
 .todo-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--text)}
 .tr-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
-.tr-cat{flex-shrink:0;width:auto;font-size:12px;color:var(--primary);font-weight:600;text-align:left;margin-top:5px}
+.tr-cat{flex-shrink:0;width:auto;font-size:11px;color:#E8B547;font-weight:400;text-align:left;margin-top:5px}
 .todo-row .tr-body{flex:1;min-width:0}
 .todo-row .tr-text{font-size:15px;word-break:break-word}
 .tr-note{font-size:12.5px;color:var(--muted);word-break:break-word;margin-top:3px}
@@ -423,7 +422,7 @@ const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const CONSENT_KEY="notes-app-v1-consent";
 const APP_NAME="PEW";
-const APP_VERSION="2.57";
+const APP_VERSION="2.58";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -445,6 +444,10 @@ function catLabel(c){
   const map=CAT_LABEL[state.lang]||CAT_LABEL.zh;
   return map[c]||CAT_LABEL.zh[c]||c;
 }
+function catLabelParen(c){
+  const l=catLabel(c);
+  return state.lang==="en"?`(${l})`:`（${l}）`;
+}
 function migrateCat(c){ return CAT_ZH2ID[c]||c; }
 
 const ALL_CAT="__all__";
@@ -458,7 +461,7 @@ const I18N={
     "privacy.title":"隐私政策","privacy.summary":"PEW 是一款本地待办与记录工具，不要求注册账号，你的记录默认只保存在本机，不上传云端。请阅读并同意隐私政策后继续使用。",
     "consent.agree":"同意并继续","consent.decline":"拒绝","consent.declineNotice":"同意隐私政策后才能使用本应用","consent.readMore":"查看完整隐私政策",
     "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanksMain":"感谢你使用 PEW，若觉得有帮助，","sponsor.thanksCta":"欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
-    "cat.all":"总览","cat.uncat":"未分类",
+    "cat.all":"首要","cat.uncat":"未分类",
     "empty.homeAll":"暂无记录","empty.homeCat":"该分类暂无记录",
     "empty.notesAll":"暂无记录","empty.notesCat":"该分类暂无记录",
     "empty.workAll":"暂无记录","empty.workCat":"该分类暂无记录",
@@ -484,7 +487,7 @@ const I18N={
     "privacy.title":"Privacy Policy","privacy.summary":"PEW is a local todo and notes tool that does not require an account. Your records are kept only on this device by default and are not uploaded to the cloud. Please review and agree to the privacy policy to continue.",
     "consent.agree":"Agree and continue","consent.decline":"Decline","consent.declineNotice":"You must agree to the privacy policy to use this app","consent.readMore":"Read full privacy policy",
     "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanksMain":"Thanks for using PEW. If it helps, ","sponsor.thanksCta":"buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
-    "cat.all":"Overview","cat.uncat":"Uncategorized",
+    "cat.all":"Primary","cat.uncat":"Uncategorized",
     "empty.homeAll":"No records yet.","empty.homeCat":"No records in this category.",
     "empty.notesAll":"No records yet.","empty.notesCat":"No records in this category.",
     "empty.workAll":"No records yet.","empty.workCat":"No records in this category.",
@@ -510,7 +513,7 @@ const I18N={
     "privacy.title":"隱私政策","privacy.summary":"PEW 是一款本地待辦與記錄工具，不需註冊帳號，你的記錄預設只儲存在本機，不會上傳雲端。請閱讀並同意隱私政策後繼續使用。",
     "consent.agree":"同意並繼續","consent.decline":"拒絕","consent.declineNotice":"同意隱私政策後才能使用本應用程式","consent.readMore":"檢視完整隱私政策",
     "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanksMain":"感謝你使用 PEW，若覺得有幫助，","sponsor.thanksCta":"歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
-    "cat.all":"總覽","cat.uncat":"未分類",
+    "cat.all":"首要","cat.uncat":"未分類",
     "empty.homeAll":"尚無記錄","empty.homeCat":"該分類尚無記錄",
     "empty.notesAll":"尚無記錄","empty.notesCat":"該分類尚無記錄",
     "empty.workAll":"尚無記錄","empty.workCat":"該分類尚無記錄",
@@ -748,7 +751,7 @@ function catIcon(c){
 function cardHtml(n,hideCat){
   return `<div class="nc-title ${n.title?"":"empty"}">${esc(n.title||t("card.untitled"))}</div>
     <div class="nc-summary">${esc(textFromHtml(n.content))||t("card.noBody")}</div>`
-    +((!hideCat&&n.category)?`<div class="nc-cat">${esc(catLabel(n.category))}</div>`:"");
+    +((!hideCat&&n.category)?`<div class="nc-cat">${esc(catLabelParen(n.category))}</div>`:"");
 }
 function bindCard(box,n,onClick,persistFn,idx,overview,cat){
   overview=!!overview;
@@ -862,7 +865,7 @@ function renderHomeList(){
     const check=overview?"":`<input type="checkbox" ${t.done?"checked":""}/>`;
     row.innerHTML=`
       ${left}
-      <div class="tr-body"><div class="tr-text">${esc(t.text)}</div>${t.note?`<div class="tr-note">${esc(t.note)}</div>`:""}${overview?`<div class="tr-cat">${esc(catLabel(cat))}</div>`:""}</div>
+      <div class="tr-body"><div class="tr-text">${esc(t.text)}</div>${t.note?`<div class="tr-note">${esc(t.note)}</div>`:""}${overview?`<div class="tr-cat">${esc(catLabelParen(cat))}</div>`:""}</div>
       ${check}`;
     const boxInput=row.querySelector("input");
     if(boxInput) boxInput.addEventListener("change",e=>{
