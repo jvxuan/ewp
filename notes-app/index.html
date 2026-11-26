@@ -327,7 +327,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.26";
+const APP_VERSION="2.27";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal 链接 / 加密钱包地址
 const SPONSOR={
   wechat:{ qr:"", note:"" },
@@ -647,10 +647,10 @@ function renderHomeList(){
     rows=[];
     orderedCats().forEach(c=>{
       const arr=(byCat[c]||[]).slice().sort(sortFn);
-      if(arr[0]) rows.push({t:arr[0],cat:c});
+      if(arr[0]&&arr.some(x=>!x.done)) rows.push({t:arr[0],cat:c});
     });
     Object.keys(byCat).forEach(c=>{
-      if(!orderedCats().includes(c)){const arr=byCat[c].slice().sort(sortFn); if(arr[0]) rows.push({t:arr[0],cat:c});}
+      if(!orderedCats().includes(c)){const arr=byCat[c].slice().sort(sortFn); if(arr[0]&&arr.some(x=>!x.done)) rows.push({t:arr[0],cat:c});}
     });
   }else{
     rows=state.todos.filter(t=>t.category===state.filterCat).sort(sortFn).map(t=>({t,cat:t.category}));
@@ -698,8 +698,9 @@ function groupFirst(list,cats,sortFn){
   const byCat={};
   list.forEach(it=>{const c=it.category||t("cat.uncat");(byCat[c]=byCat[c]||[]).push(it);});
   const rows=[];
-  cats.forEach(c=>{const arr=(byCat[c]||[]).slice().sort(sortFn); if(arr[0]) rows.push({it:arr[0],cat:c});});
-  Object.keys(byCat).forEach(c=>{if(!cats.includes(c)){const arr=byCat[c].slice().sort(sortFn); if(arr[0]) rows.push({it:arr[0],cat:c});}});
+  const hasOpen=arr=>arr.some(it=>!it.done);
+  cats.forEach(c=>{const arr=(byCat[c]||[]).slice().sort(sortFn); if(arr[0]&&hasOpen(arr)) rows.push({it:arr[0],cat:c});});
+  Object.keys(byCat).forEach(c=>{if(!cats.includes(c)){const arr=byCat[c].slice().sort(sortFn); if(arr[0]&&hasOpen(arr)) rows.push({it:arr[0],cat:c});}});
   return rows;
 }
 function renderNotesList(){
