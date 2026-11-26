@@ -133,6 +133,15 @@ button{font-family:inherit;cursor:pointer}
 .cm-item button:hover{color:var(--primary)}
 .cm-item button.del:hover{color:var(--danger)}
 
+/* ---------- 回收站 ---------- */
+.tr-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:11px 12px}
+.tr-row .tr-body{flex:1;min-width:0}
+.tr-row .tr-src{font-size:11px;color:var(--muted);margin-bottom:2px}
+.tr-row .tr-title{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-row .tr-actions{display:flex;gap:6px;flex-shrink:0}
+.tr-row .tr-actions button{border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:6px 9px;font-size:13px}
+.tr-row .tr-actions .forever{color:var(--danger);border-color:var(--danger)}
+
 /* 应用内弹窗 */
 .modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:80}
 .modal{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-50%);z-index:81;background:var(--panel);border-radius:18px;padding:20px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
@@ -228,6 +237,7 @@ button{font-family:inherit;cursor:pointer}
       <button class="btn small lang-opt" data-lang="zhTW">繁體</button>
       <button class="btn small lang-opt" data-lang="en">English</button>
     </span></div>
+    <div class="setting-row"><span data-i18n="setting.trash">回收站</span><button class="btn small" id="btn-trash" data-i18n="trash.manage">查看</button></div>
     <div class="setting-row"><span data-i18n="setting.sponsor">赞助支持</span><button class="btn small" id="btn-sponsor" data-i18n="sponsor.support">支持</button></div>
     <div class="setting-row"><span data-i18n="setting.about">关于</span><span id="about-ver" style="color:var(--muted);font-size:13px"></span></div>
   </section>
@@ -288,6 +298,16 @@ button{font-family:inherit;cursor:pointer}
     </div>
   </div>
 
+  <!-- 回收站抽屉 -->
+  <div id="trash-manager" hidden>
+    <div class="drawer-mask" id="tr-mask"></div>
+    <div class="drawer">
+      <h3 data-i18n="setting.trash">回收站</h3>
+      <div class="cm-list" id="tr-list"></div>
+      <button class="btn danger" id="tr-empty" data-i18n="trash.emptyBin">清空回收站</button>
+      <button class="btn" id="tr-close" data-i18n="drawer.done">完成</button>
+    </div>
+  </div>
   <!-- 分类选择弹层 -->
   <div id="cat-picker" hidden>
     <div class="drawer-mask" id="cp-mask"></div>
@@ -329,7 +349,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.34";
+const APP_VERSION="2.35";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -377,7 +397,8 @@ const I18N={
     "modal.renameCat":"修改分类","modal.delCat":"删除分类","modal.delCatMsg":"删除分类「{c}」？其下记录将归入「{f}」。",
     "modal.discard":"放弃修改","modal.discardMsg":"有未保存的修改，确定离开？",
     "modal.clearData":"清空数据","modal.clearMsg":"确定清空本地全部记录？此操作不可恢复。",
-    "drawer.catManage":"分类管理","drawer.add":"添加","drawer.done":"完成","drawer.chooseCat":"选择分类"
+    "drawer.catManage":"分类管理","drawer.add":"添加","drawer.done":"完成","drawer.chooseCat":"选择分类",
+    "setting.trash":"回收站","trash.manage":"查看","trash.restore":"恢复","trash.forever":"彻底删除","trash.empty":"回收站为空","trash.emptyBin":"清空回收站","trash.emptyMsg":"将永久删除回收站中的全部记录？此操作不可恢复。","trash.foreverMsg":"将永久删除这条记录？此操作不可恢复。","toast.restored":"已恢复"
   },
   en:{
     "tab.notes":"Execute","tab.work":"Work","tab.home":"Pay","tab.settings":"Settings",
@@ -400,7 +421,8 @@ const I18N={
     "modal.renameCat":"Rename category","modal.delCat":"Delete category","modal.delCatMsg":"Delete category \"{c}\"? Its records will move to \"{f}\".",
     "modal.discard":"Discard changes","modal.discardMsg":"You have unsaved changes. Leave anyway?",
     "modal.clearData":"Clear data","modal.clearMsg":"Delete all local records? This cannot be undone.",
-    "drawer.catManage":"Categories","drawer.add":"Add","drawer.done":"Done","drawer.chooseCat":"Choose category"
+    "drawer.catManage":"Categories","drawer.add":"Add","drawer.done":"Done","drawer.chooseCat":"Choose category",
+    "setting.trash":"Trash","trash.manage":"View","trash.restore":"Restore","trash.forever":"Delete forever","trash.empty":"Trash is empty","trash.emptyBin":"Empty trash","trash.emptyMsg":"Permanently delete all records in trash? This cannot be undone.","trash.foreverMsg":"Permanently delete this record? This cannot be undone.","toast.restored":"Restored"
   },
   zhTW:{
     "tab.notes":"執行","tab.work":"工作","tab.home":"支付","tab.settings":"設定",
@@ -423,7 +445,8 @@ const I18N={
     "modal.renameCat":"修改分類","modal.delCat":"刪除分類","modal.delCatMsg":"刪除分類「{c}」？其下記錄將歸入「{f}」。",
     "modal.discard":"放棄修改","modal.discardMsg":"有未儲存的修改，確定離開？",
     "modal.clearData":"清空資料","modal.clearMsg":"確定清空本地全部記錄？此操作無法復原。",
-    "drawer.catManage":"分類管理","drawer.add":"新增","drawer.done":"完成","drawer.chooseCat":"選擇分類"
+    "drawer.catManage":"分類管理","drawer.add":"新增","drawer.done":"完成","drawer.chooseCat":"選擇分類",
+    "setting.trash":"回收筒","trash.manage":"檢視","trash.restore":"還原","trash.forever":"永久刪除","trash.empty":"回收筒為空","trash.emptyBin":"清空回收筒","trash.emptyMsg":"將永久刪除回收筒中的全部記錄？此操作無法復原。","trash.foreverMsg":"將永久刪除這條記錄？此操作無法復原。","toast.restored":"已還原"
   }
 };
 function t(key,vars){
@@ -455,6 +478,7 @@ const loadOrder=()=>load(ORDER_KEY)||[];
 const persistOrder=()=>save(ORDER_KEY,state.catOrder);
 const loadRetired=()=>load(RETIRED_KEY)||[];
 const persistRetired=()=>save(RETIRED_KEY,state.retired);
+const live=list=>(list||[]).filter(x=>!x.deleted);
 
 /* ---------- 工具 ---------- */
 function toast(msg){const el=$("#toast");el.textContent=msg;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,1800);}
@@ -505,7 +529,7 @@ const modalPrompt=(title,initial,placeholder)=>openModal({title,showInput:true,i
 function categories(){
   const merged=PRESET_CATS.filter(c=>!state.retired.includes(c));
   state.customCats.forEach(c=>{if(!merged.includes(c))merged.push(c);});
-  state.todos.forEach(t=>{if(t.category&&!merged.includes(t.category))merged.push(t.category);});
+  live(state.todos).forEach(t=>{if(t.category&&!merged.includes(t.category))merged.push(t.category);});
   return merged;
 }
 function orderedCats(){
@@ -517,14 +541,14 @@ function orderedCats(){
 function noteCats(){
   const merged=EXEC_CATS.filter(c=>!state.retired.includes(c));
   state.customCats.forEach(c=>{if(!merged.includes(c))merged.push(c);});
-  state.notes.forEach(n=>{if(n.category&&!merged.includes(n.category))merged.push(n.category);});
+  live(state.notes).forEach(n=>{if(n.category&&!merged.includes(n.category))merged.push(n.category);});
   const order=(state.catOrder||[]).filter(c=>merged.includes(c));
   return [...order,...merged.filter(c=>!order.includes(c))];
 }
 function workCats(){
   const merged=WORK_CATS.filter(c=>!state.retired.includes(c));
   state.customCats.forEach(c=>{if(!merged.includes(c))merged.push(c);});
-  state.workNotes.forEach(w=>{if(w.category&&!merged.includes(w.category))merged.push(w.category);});
+  live(state.workNotes).forEach(w=>{if(w.category&&!merged.includes(w.category))merged.push(w.category);});
   const order=(state.catOrder||[]).filter(c=>merged.includes(c));
   return [...order,...merged.filter(c=>!order.includes(c))];
 }
@@ -651,7 +675,7 @@ function renderHomeList(){
   let rows;
   if(state.filterCat===ALL_CAT){
     const byCat={};
-    state.todos.forEach(td=>{const c=td.category||t("cat.uncat");(byCat[c]=byCat[c]||[]).push(td);});
+    live(state.todos).forEach(td=>{const c=td.category||t("cat.uncat");(byCat[c]=byCat[c]||[]).push(td);});
     rows=[];
     orderedCats().forEach(c=>{
       const arr=(byCat[c]||[]).slice().sort(sortFn);
@@ -661,7 +685,7 @@ function renderHomeList(){
       if(!orderedCats().includes(c)){const arr=byCat[c].slice().sort(sortFn); if(arr[0]&&arr.some(x=>!x.done)) rows.push({t:arr[0],cat:c});}
     });
   }else{
-    rows=state.todos.filter(t=>t.category===state.filterCat).sort(sortFn).map(t=>({t,cat:t.category}));
+    rows=live(state.todos).filter(t=>t.category===state.filterCat).sort(sortFn).map(t=>({t,cat:t.category}));
   }
   const box=$("#home-list"); box.innerHTML="";
   if(!rows.length){box.innerHTML=`<div class="empty-tip">${state.filterCat===ALL_CAT?t("empty.homeAll"):t("empty.homeCat")}</div>`;return;}
@@ -716,8 +740,8 @@ function renderNotesList(){
   const sortFn=(a,b)=>Number(a.done)-Number(b.done)||b.updated_at.localeCompare(a.updated_at);
   const box=$("#notes-list"); box.innerHTML="";
   let rows;
-  if(f===ALL_CAT){ rows=groupFirst(state.notes,noteCats(),sortFn); }
-  else{ rows=state.notes.filter(n=>n.category===f).sort(sortFn).map(n=>({it:n,cat:n.category})); }
+  if(f===ALL_CAT){ rows=groupFirst(live(state.notes),noteCats(),sortFn); }
+  else{ rows=live(state.notes).filter(n=>n.category===f).sort(sortFn).map(n=>({it:n,cat:n.category})); }
   if(!rows.length){box.innerHTML=`<div class="empty-tip">${f===ALL_CAT?t("empty.notesAll"):t("empty.notesCat")}</div>`;return;}
   const overview=f===ALL_CAT;
   rows.forEach(({it,cat},idx)=>bindCard(box,it,openNote,persistNotes,idx,overview,cat));
@@ -727,8 +751,8 @@ function renderWorkList(){
   const sortFn=(a,b)=>Number(a.done)-Number(b.done)||b.updated_at.localeCompare(a.updated_at);
   const box=$("#work-list"); box.innerHTML="";
   let rows;
-  if(f===ALL_CAT){ rows=groupFirst(state.workNotes,workCats(),sortFn); }
-  else{ rows=state.workNotes.filter(w=>w.category===f).sort(sortFn).map(w=>({it:w,cat:w.category})); }
+  if(f===ALL_CAT){ rows=groupFirst(live(state.workNotes),workCats(),sortFn); }
+  else{ rows=live(state.workNotes).filter(w=>w.category===f).sort(sortFn).map(w=>({it:w,cat:w.category})); }
   if(!rows.length){box.innerHTML=`<div class="empty-tip">${f===ALL_CAT?t("empty.workAll"):t("empty.workCat")}</div>`;return;}
   const overview=f===ALL_CAT;
   rows.forEach(({it,cat},idx)=>bindCard(box,it,openWork,persistWork,idx,overview,cat));
@@ -888,14 +912,63 @@ async function deleteCurrent(){
   const ok=await modalConfirm(label,t("modal.delConfirm"),{danger:true,okText:t("action.delete")});
   if(!ok)return;
   if(isTodo){
-    state.todos=state.todos.filter(x=>x!==state.currentItem); persistTodos();
+    if(state.currentItem) state.currentItem.deleted=true; persistTodos();
   }else if(isWork){
-    state.workNotes=state.workNotes.filter(x=>x!==state.currentItem); persistWork();
+    if(state.currentItem) state.currentItem.deleted=true; persistWork();
   }else{
-    state.notes=state.notes.filter(x=>x!==state.currentItem); persistNotes();
+    if(state.currentItem) state.currentItem.deleted=true; persistNotes();
   }
   state.currentId=null; state.currentItem=null; state.currentKind=null;
   renderAll(); closeEditor(); toast(t("toast.deleted"));
+}
+
+/* ---------- 回收站 ---------- */
+function trashItems(){
+  const out=[];
+  state.todos.forEach(x=>{if(x.deleted)out.push({src:"todo",it:x});});
+  state.notes.forEach(x=>{if(x.deleted)out.push({src:"note",it:x});});
+  state.workNotes.forEach(x=>{if(x.deleted)out.push({src:"work",it:x});});
+  return out;
+}
+function trashTable(src){ return src==="todo"?state.todos:src==="work"?state.workNotes:state.notes; }
+function trashPersist(src){ if(src==="todo")persistTodos(); else if(src==="work")persistWork(); else persistNotes(); }
+function trashTitle(it,src){ return src==="todo"?(it.text||""):(it.title||""); }
+function openTrash(){ $("#trash-manager").hidden=false; renderTrash(); }
+function closeTrash(){ $("#trash-manager").hidden=true; }
+function renderTrash(){
+  const list=$("#tr-list"); list.innerHTML="";
+  const items=trashItems();
+  $("#tr-empty").style.display=items.length?"":"none";
+  if(!items.length){ list.innerHTML=`<div class="empty-tip">${t("trash.empty")}</div>`; return; }
+  items.forEach(({src,it})=>{
+    const row=document.createElement("div");
+    row.className="tr-row";
+    const title=esc(trashTitle(it,src)||t("card.untitled"));
+    const sub=src==="todo"?esc(it.note||""):esc(textFromHtml(it.content)||"");
+    const srcLabel=src==="todo"?t("tab.home"):src==="work"?t("tab.work"):t("tab.notes");
+    row.innerHTML=`<div class="tr-body"><div class="tr-src">${esc(srcLabel)}</div><div class="tr-title">${title}</div>${sub?`<div style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sub}</div>`:""}</div>
+      <div class="tr-actions"><button class="restore">${t("trash.restore")}</button><button class="forever">${t("trash.forever")}</button></div>`;
+    row.querySelector(".restore").addEventListener("click",()=>{
+      it.deleted=false; trashPersist(src); renderAll(); renderTrash(); toast(t("toast.restored"));
+    });
+    row.querySelector(".forever").addEventListener("click",async()=>{
+      const ok=await modalConfirm(t("trash.forever"),t("trash.foreverMsg"),{danger:true,okText:t("trash.forever")});
+      if(!ok)return;
+      const tbl=trashTable(src);
+      const idx=tbl.indexOf(it); if(idx>=0)tbl.splice(idx,1);
+      trashPersist(src); renderAll(); renderTrash(); toast(t("toast.deleted"));
+    });
+    list.appendChild(row);
+  });
+}
+async function emptyTrash(){
+  if(!trashItems().length)return;
+  const ok=await modalConfirm(t("trash.emptyBin"),t("trash.emptyMsg"),{danger:true,okText:t("trash.emptyBin")});
+  if(!ok)return;
+  state.todos=state.todos.filter(x=>!x.deleted);
+  state.notes=state.notes.filter(x=>!x.deleted);
+  state.workNotes=state.workNotes.filter(x=>!x.deleted);
+  persistTodos();persistNotes();persistWork(); renderAll(); renderTrash(); toast(t("toast.deleted"));
 }
 
 /* ---------- 分类管理 ---------- */
@@ -1023,7 +1096,7 @@ async function copyText(v){
 }
 
 function downloadJson(){
-  const blob=new Blob([JSON.stringify({todos:state.todos,notes:state.notes,workNotes:state.workNotes},null,2)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({todos:live(state.todos),notes:live(state.notes),workNotes:live(state.workNotes)},null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes-backup.json";a.click();URL.revokeObjectURL(a.href);
   toast(t("toast.exported"));
 }
@@ -1037,10 +1110,10 @@ function importBackup(file){
     const ok=await modalConfirm(t("modal.import"),t("modal.importMsg"),{okText:t("setting.import")});
     if(!ok)return;
     const ts=new Date().toISOString().slice(0,19);
-    state.todos=data.todos.map(x=>({id:x.id||uid(),text:x.text||"",note:x.note||"",category:migrateCat(x.category)||PRESET_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
+    state.todos=data.todos.map(x=>({id:x.id||uid(),text:x.text||"",note:x.note||"",category:migrateCat(x.category)||PRESET_CATS[0],done:!!x.done,deleted:!!x.deleted,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
     const importedCustom=new Set();
-    state.notes=data.notes.map(x=>{const c=migrateCat(x.category)||EXEC_CATS[0]; if(!EXEC_CATS.includes(c))importedCustom.add(c); return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:c,done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
-    state.workNotes=data.workNotes.map(x=>{const c=migrateCat(x.category)||WORK_CATS[0]; if(!WORK_CATS.includes(c))importedCustom.add(c); return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:c,done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
+    state.notes=data.notes.map(x=>{const c=migrateCat(x.category)||EXEC_CATS[0]; if(!EXEC_CATS.includes(c))importedCustom.add(c); return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:c,done:!!x.done,deleted:!!x.deleted,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
+    state.workNotes=data.workNotes.map(x=>{const c=migrateCat(x.category)||WORK_CATS[0]; if(!WORK_CATS.includes(c))importedCustom.add(c); return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:c,done:!!x.done,deleted:!!x.deleted,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
     importedCustom.forEach(c=>{if(c&&!state.customCats.includes(c))state.customCats.push(c);});
     persistTodos();persistNotes();persistWork();persistCats();persistOrder();
     renderAll(); toast(t("toast.imported"));
@@ -1114,6 +1187,10 @@ function bind(){
   $("#btn-sponsor").addEventListener("click",openSponsor);
   $("#sp-mask").addEventListener("click",closeSponsor);
   $("#sp-close").addEventListener("click",closeSponsor);
+  $("#btn-trash").addEventListener("click",openTrash);
+  $("#tr-mask").addEventListener("click",closeTrash);
+  $("#tr-close").addEventListener("click",closeTrash);
+  $("#tr-empty").addEventListener("click",emptyTrash);
   document.querySelectorAll("#sp-tabs .sp-tab").forEach(b=>b.addEventListener("click",()=>{spChannel=b.dataset.ch;renderSponsor();}));
 
   document.querySelectorAll("#lang-switch .lang-opt").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
@@ -1143,12 +1220,12 @@ function init(){
     }
   }
   if(!state.workNotes.length){ state.workNotes=seedWork(); persistWork(); }
-  state.todos.forEach(t=>{if(!t.id)t.id=uid(); t.category=migrateCat(t.category);});
+  state.todos.forEach(t=>{if(!t.id)t.id=uid(); t.category=migrateCat(t.category); t.deleted=!!t.deleted;});
   state.customCats=(loadCats()||[]).map(migrateCat);
   state.catOrder=(loadOrder()||[]).map(migrateCat);
   state.retired=(loadRetired()||[]).map(migrateCat);
-  state.notes.forEach(n=>{if(!n.id)n.id=uid(); if(n.done===undefined)n.done=false; const c=migrateCat(n.category); n.category=(EXEC_CATS.includes(c)||state.customCats.includes(c))?c:EXEC_CATS[0];});
-  state.workNotes.forEach(w=>{if(!w.id)w.id=uid(); if(w.done===undefined)w.done=false; const c=migrateCat(w.category); w.category=(WORK_CATS.includes(c)||state.customCats.includes(c))?c:WORK_CATS[0];});
+  state.notes.forEach(n=>{if(!n.id)n.id=uid(); if(n.done===undefined)n.done=false; n.deleted=!!n.deleted; const c=migrateCat(n.category); n.category=(EXEC_CATS.includes(c)||state.customCats.includes(c))?c:EXEC_CATS[0];});
+  state.workNotes.forEach(w=>{if(!w.id)w.id=uid(); if(w.done===undefined)w.done=false; w.deleted=!!w.deleted; const c=migrateCat(w.category); w.category=(WORK_CATS.includes(c)||state.customCats.includes(c))?c:WORK_CATS[0];});
   setupSortable($("#cm-list"),{
     gripSel:".cm-grip",itemSel:".cm-item",dataAttr:"cat",
     onReorder:order=>{state.catOrder=order;persistOrder();renderAll();renderCatManager();}
