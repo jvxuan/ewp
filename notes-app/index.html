@@ -238,14 +238,12 @@ button{font-family:inherit;cursor:pointer}
 
   <!-- 设置 -->
   <section class="view" id="view-settings">
-    <div class="setting-row"><span data-i18n="setting.exportAll">导出全部数据（JSON）</span><button class="btn small" id="btn-export-all" data-i18n="setting.export">导出</button></div>
-    <div class="setting-row"><span data-i18n="setting.importAll">导入备份（JSON）</span><button class="btn small" id="btn-import-all" data-i18n="setting.import">导入</button></div>
-    <input type="file" id="import-file" accept="application/json,.json" hidden />
     <div class="setting-row"><span data-i18n="setting.language">语言</span><span class="lang-switch" id="lang-switch">
       <button class="btn small lang-opt" data-lang="zh">简体</button>
       <button class="btn small lang-opt" data-lang="zhTW">繁體</button>
       <button class="btn small lang-opt" data-lang="en">English</button>
     </span></div>
+    <div class="setting-row"><span data-i18n="setting.backup">数据备份</span><button class="btn small" id="btn-backup" data-i18n="trash.manage">查看</button></div>
     <div class="setting-row"><span data-i18n="setting.trash">回收站</span><button class="btn small" id="btn-trash" data-i18n="trash.manage">查看</button></div>
     <div class="setting-row"><span data-i18n="setting.sponsor">赞助支持</span><button class="btn small" id="btn-sponsor" data-i18n="sponsor.support">支持</button></div>
     <div class="setting-row"><span data-i18n="setting.about">关于</span><span id="about-ver" style="color:var(--muted);font-size:13px"></span></div>
@@ -261,6 +259,19 @@ button{font-family:inherit;cursor:pointer}
       <div class="trash-cards" id="trash-cards"></div>
       <div class="note-list" id="tr-list"></div>
       <button class="btn danger" id="tr-empty" data-i18n="trash.emptyBin">清空回收站</button>
+    </div>
+  </section>
+
+  <!-- 数据备份（独立页面，带返回） -->
+  <section id="view-backup" hidden>
+    <div class="editor-top">
+      <button class="back-btn" id="backup-back" title="返回">‹</button>
+      <span class="trash-top-title" data-i18n="setting.backup">数据备份</span>
+    </div>
+    <div class="trash-body">
+      <div class="setting-row"><span data-i18n="setting.exportAll">导出全部数据（JSON）</span><button class="btn small" id="btn-export-all" data-i18n="setting.export">导出</button></div>
+      <div class="setting-row"><span data-i18n="setting.importAll">导入备份（JSON）</span><button class="btn small" id="btn-import-all" data-i18n="setting.import">导入</button></div>
+      <input type="file" id="import-file" accept="application/json,.json" hidden />
     </div>
   </section>
 
@@ -361,7 +372,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.42";
+const APP_VERSION="2.43";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -392,7 +403,7 @@ const I18N={
     "tab.notes":"执行","tab.work":"工作","tab.home":"支付","tab.settings":"设置",
     "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
     "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
-    "setting.language":"语言","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
+    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
     "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanks":"感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
     "cat.all":"总览","cat.uncat":"未分类",
     "empty.homeAll":"还没有待办记录，点右上角 ＋ 新建","empty.homeCat":"该分类暂无待办记录",
@@ -416,7 +427,7 @@ const I18N={
     "tab.notes":"Execute","tab.work":"Work","tab.home":"Pay","tab.settings":"Settings",
     "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
     "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
-    "setting.language":"Language","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
+    "setting.language":"Language","setting.backup":"Data Backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
     "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanks":"Thanks for using EWP. If it helps, buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
     "cat.all":"Overview","cat.uncat":"Uncategorized",
     "empty.homeAll":"No todos yet. Tap ＋ top right to add","empty.homeCat":"No todo records in this category",
@@ -440,7 +451,7 @@ const I18N={
     "tab.notes":"執行","tab.work":"工作","tab.home":"支付","tab.settings":"設定",
     "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
     "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
-    "setting.language":"語言","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
+    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
     "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanks":"感謝你使用 EWP，若覺得有幫助，歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
     "cat.all":"總覽","cat.uncat":"未分類",
     "empty.homeAll":"還沒有待辦記錄，點右上角 ＋ 新增","empty.homeCat":"該分類尚無待辦記錄",
@@ -471,7 +482,7 @@ const state={
   todos:[], notes:[], workNotes:[], customCats:[], catOrder:[], retired:[],
   currentKind:null, currentId:null, currentItem:null,
   draft:{category:""},
-  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, trashFilter:"note", trashFrom:"settings", dirty:false, editorFrom:"notes",
+  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, trashFilter:"note", trashFrom:"settings", backupFrom:"settings", dirty:false, editorFrom:"notes",
   lang:(load(LANG_KEY)||"zh")
 };
 
@@ -960,6 +971,19 @@ function closeTrash(){
   $("#main-tabbar").hidden=false;
   switchTab(state.trashFrom||"settings");
 }
+function openBackup(){
+  state.backupFrom=state.tab;
+  ["home","notes","work","settings"].forEach(t=>$("#view-"+t).hidden=true);
+  $("#main-topbar").hidden=true;
+  $("#main-tabbar").hidden=true;
+  $("#view-backup").hidden=false;
+}
+function closeBackup(){
+  $("#view-backup").hidden=true;
+  $("#main-topbar").hidden=false;
+  $("#main-tabbar").hidden=false;
+  switchTab(state.backupFrom||"settings");
+}
 function trashCount(src){ return trashItems().filter(x=>x.src===src).length; }
 function renderTrash(){
   const cards=$("#trash-cards"); cards.innerHTML="";
@@ -1224,6 +1248,8 @@ function bind(){
   $("#btn-trash").addEventListener("click",openTrash);
   $("#trash-back").addEventListener("click",closeTrash);
   $("#tr-empty").addEventListener("click",emptyTrash);
+  $("#btn-backup").addEventListener("click",openBackup);
+  $("#backup-back").addEventListener("click",closeBackup);
   document.querySelectorAll("#sp-tabs .sp-tab").forEach(b=>b.addEventListener("click",()=>{spChannel=b.dataset.ch;renderSponsor();}));
 
   document.querySelectorAll("#lang-switch .lang-opt").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
