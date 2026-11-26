@@ -79,6 +79,16 @@ button{font-family:inherit;cursor:pointer}
 .placeholder .ph-icon{font-size:44px}
 .placeholder h3{color:var(--text);font-size:16px}
 .setting-row{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px}
+.sp-thanks{font-size:13px;color:var(--muted);line-height:1.6;margin:6px 0 14px;text-align:center}
+.sp-tabs{display:flex;gap:8px;margin-bottom:14px}
+.sp-tab{flex:1;border:1px solid var(--border);background:var(--bg);border-radius:10px;padding:9px 0;font-size:13px;color:var(--muted)}
+.sp-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.sp-body{display:flex;flex-direction:column;align-items:center;gap:12px;min-height:180px;justify-content:center}
+.sp-qr{width:180px;height:180px;border-radius:12px;border:1px solid var(--border);object-fit:cover;background:var(--bg)}
+.sp-row{width:100%;display:flex;flex-direction:column;gap:10px}
+.sp-addr{width:100%;display:flex;gap:8px;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.sp-addr .sp-addr-text{flex:1;font-size:13px;word-break:break-all;line-height:1.5}
+.sp-empty{color:var(--muted);font-size:13px;padding:40px 0;text-align:center}
 
 /* ---------- 编辑页（独立视图） ---------- */
 #view-editor{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
@@ -216,6 +226,7 @@ button{font-family:inherit;cursor:pointer}
       <button class="btn small lang-opt" data-lang="zhTW">繁體</button>
       <button class="btn small lang-opt" data-lang="en">English</button>
     </span></div>
+    <div class="setting-row"><span data-i18n="setting.sponsor">赞助支持</span><button class="btn small" id="btn-sponsor" data-i18n="sponsor.support">支持</button></div>
     <div class="setting-row"><span data-i18n="setting.about">关于</span><span id="about-ver" style="color:var(--muted);font-size:13px"></span></div>
   </section>
 
@@ -284,6 +295,22 @@ button{font-family:inherit;cursor:pointer}
       <button class="btn" id="cp-close" data-i18n="modal.cancel">取消</button>
     </div>
   </div>
+
+  <!-- 赞助弹层 -->
+  <div id="sponsor" hidden>
+    <div class="drawer-mask" id="sp-mask"></div>
+    <div class="drawer">
+      <h3 data-i18n="setting.sponsor">赞助支持</h3>
+      <p class="sp-thanks" id="sp-thanks"></p>
+      <div class="sp-tabs" id="sp-tabs">
+        <button class="sp-tab" data-ch="wechat"></button>
+        <button class="sp-tab" data-ch="alipay"></button>
+        <button class="sp-tab" data-ch="international"></button>
+      </div>
+      <div class="sp-body" id="sp-body"></div>
+      <button class="btn" id="sp-close" data-i18n="drawer.done">完成</button>
+    </div>
+  </div>
 </div>
 
 <div id="toast" class="toast" hidden></div>
@@ -300,7 +327,13 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.25";
+const APP_VERSION="2.26";
+// 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal 链接 / 加密钱包地址
+const SPONSOR={
+  wechat:{ qr:"", note:"" },
+  alipay:{ qr:"", note:"" },
+  international:{ paypal:"", crypto:"", cryptoLabel:"" }
+};
 // 标配分类用稳定 ID 存储，显示名随当前语言走 CAT_LABEL 字典；自定义分类存原名
 const PRESET_CATS=["life","family","work","finance"];
 const EXEC_CATS=["personal","family"];
@@ -326,6 +359,7 @@ const I18N={
     "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
     "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
     "setting.language":"语言","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
+    "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanks":"感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.crypto":"加密钱包",
     "cat.all":"总览","cat.uncat":"未分类",
     "empty.homeAll":"暂无待办","empty.homeCat":"该分类暂无待办",
     "empty.notesAll":"还没有执行记录，点右上角 ＋ 新建","empty.notesCat":"该分类暂无执行记录",
@@ -348,6 +382,7 @@ const I18N={
     "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
     "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
     "setting.language":"Language","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
+    "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanks":"Thanks for using EWP. If it helps, buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.crypto":"Crypto",
     "cat.all":"Overview","cat.uncat":"Uncategorized",
     "empty.homeAll":"No todos yet","empty.homeCat":"No todos in this category",
     "empty.notesAll":"No tasks yet. Tap ＋ top right to add","empty.notesCat":"No tasks in this category",
@@ -370,6 +405,7 @@ const I18N={
     "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
     "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
     "setting.language":"語言","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
+    "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanks":"感謝你使用 EWP，若覺得有幫助，歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.crypto":"加密錢包",
     "cat.all":"總覽","cat.uncat":"未分類",
     "empty.homeAll":"尚無待辦","empty.homeCat":"該分類尚無待辦",
     "empty.notesAll":"還沒有執行記錄，點右上角 ＋ 新增","empty.notesCat":"該分類尚無執行記錄",
@@ -435,6 +471,7 @@ function setLang(lang){
   if(!I18N[lang])lang="zh";
   state.lang=lang; save(LANG_KEY,lang);
   applyStaticText(); renderAll(); switchTab(state.tab);
+  if(!$("#sponsor").hidden) renderSponsor();
 }
 
 /* ---------- 应用内弹窗 ---------- */
@@ -919,6 +956,50 @@ $("#cm-input").addEventListener("keydown",e=>{if(e.key==="Enter")$("#cm-add-btn"
 $("#cm-mask").addEventListener("click",closeCatManager);
 $("#cm-close").addEventListener("click",closeCatManager);
 
+/* ---------- 赞助 ---------- */
+let spChannel="wechat";
+function openSponsor(){ $("#sponsor").hidden=false; spChannel="wechat"; renderSponsor(); }
+function closeSponsor(){ $("#sponsor").hidden=true; }
+function spAddrRow(label,value){
+  const row=document.createElement("div"); row.className="sp-addr";
+  const txt=document.createElement("span"); txt.className="sp-addr-text"; txt.textContent=label+"："+value;
+  const btn=document.createElement("button"); btn.className="btn small"; btn.textContent=t("sponsor.copy");
+  btn.addEventListener("click",()=>copyText(value));
+  row.appendChild(txt); row.appendChild(btn);
+  return row;
+}
+function renderSponsor(){
+  document.querySelectorAll("#sp-tabs .sp-tab").forEach(b=>{
+    b.textContent=t("sponsor."+b.dataset.ch);
+    b.classList.toggle("active",b.dataset.ch===spChannel);
+  });
+  $("#sp-thanks").textContent=t("sponsor.thanks");
+  const body=$("#sp-body"); body.innerHTML="";
+  if(spChannel==="wechat"||spChannel==="alipay"){
+    const cfg=SPONSOR[spChannel];
+    if(cfg.qr){
+      const img=document.createElement("img"); img.className="sp-qr"; img.src=cfg.qr; img.alt="QR"; body.appendChild(img);
+      if(cfg.note){const n=document.createElement("div");n.className="sp-empty";n.textContent=cfg.note;body.appendChild(n);}
+    }else{
+      const e=document.createElement("div");e.className="sp-empty";e.textContent=t("sponsor.empty");body.appendChild(e);
+    }
+  }else{
+    const row=document.createElement("div");row.className="sp-row";
+    if(SPONSOR.international.paypal) row.appendChild(spAddrRow(t("sponsor.paypal"),SPONSOR.international.paypal));
+    if(SPONSOR.international.crypto) row.appendChild(spAddrRow(SPONSOR.international.cryptoLabel||t("sponsor.crypto"),SPONSOR.international.crypto));
+    if(!row.children.length){const e=document.createElement("div");e.className="sp-empty";e.textContent=t("sponsor.empty");row.appendChild(e);}
+    body.appendChild(row);
+  }
+}
+async function copyText(v){
+  try{ await navigator.clipboard.writeText(v); toast(t("sponsor.copied")); }
+  catch(e){
+    const ta=document.createElement("textarea");ta.value=v;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");toast(t("sponsor.copied"));}catch(_){toast(t("sponsor.empty"));}
+    ta.remove();
+  }
+}
+
 function downloadJson(){
   const blob=new Blob([JSON.stringify({todos:state.todos,notes:state.notes,workNotes:state.workNotes},null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes-backup.json";a.click();URL.revokeObjectURL(a.href);
@@ -1005,6 +1086,11 @@ function bind(){
   $("#editor-cat").addEventListener("click",openCatPicker);
   $("#cp-mask").addEventListener("click",closeCatPicker);
   $("#cp-close").addEventListener("click",closeCatPicker);
+
+  $("#btn-sponsor").addEventListener("click",openSponsor);
+  $("#sp-mask").addEventListener("click",closeSponsor);
+  $("#sp-close").addEventListener("click",closeSponsor);
+  document.querySelectorAll("#sp-tabs .sp-tab").forEach(b=>b.addEventListener("click",()=>{spChannel=b.dataset.ch;renderSponsor();}));
 
   document.querySelectorAll("#lang-switch .lang-opt").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
 }
