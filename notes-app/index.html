@@ -329,12 +329,12 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.30";
-// 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal 链接 / 加密钱包地址
+const APP_VERSION="2.31";
+// 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
   alipay:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/XVeWbb0sxoopOqxDCmBcsSjLn8e", note:"" },
-  international:{ paypal:"", crypto:"", cryptoLabel:"" }
+  international:{ paypal:"", kofi:"https://ko-fi.com/jvxuan", crypto:"", cryptoLabel:"" }
 };
 // 标配分类用稳定 ID 存储，显示名随当前语言走 CAT_LABEL 字典；自定义分类存原名
 const PRESET_CATS=["life","family","work","finance"];
@@ -361,7 +361,7 @@ const I18N={
     "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
     "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
     "setting.language":"语言","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
-    "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanks":"感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.crypto":"加密钱包",
+    "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanks":"感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
     "cat.all":"总览","cat.uncat":"未分类",
     "empty.homeAll":"还没有待办记录，点右上角 ＋ 新建","empty.homeCat":"该分类暂无待办记录",
     "empty.notesAll":"还没有执行记录，点右上角 ＋ 新建","empty.notesCat":"该分类暂无执行记录",
@@ -384,7 +384,7 @@ const I18N={
     "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
     "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
     "setting.language":"Language","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
-    "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanks":"Thanks for using EWP. If it helps, buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.crypto":"Crypto",
+    "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanks":"Thanks for using EWP. If it helps, buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
     "cat.all":"Overview","cat.uncat":"Uncategorized",
     "empty.homeAll":"No todos yet. Tap ＋ top right to add","empty.homeCat":"No todo records in this category",
     "empty.notesAll":"No tasks yet. Tap ＋ top right to add","empty.notesCat":"No tasks in this category",
@@ -407,7 +407,7 @@ const I18N={
     "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
     "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
     "setting.language":"語言","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
-    "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanks":"感謝你使用 EWP，若覺得有幫助，歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.crypto":"加密錢包",
+    "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanks":"感謝你使用 EWP，若覺得有幫助，歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
     "cat.all":"總覽","cat.uncat":"未分類",
     "empty.homeAll":"還沒有待辦記錄，點右上角 ＋ 新增","empty.homeCat":"該分類尚無待辦記錄",
     "empty.notesAll":"還沒有執行記錄，點右上角 ＋ 新增","empty.notesCat":"該分類尚無執行記錄",
@@ -963,7 +963,7 @@ $("#cm-close").addEventListener("click",closeCatManager);
 let spChannel="wechat";
 function openSponsor(){ $("#sponsor").hidden=false; spChannel="wechat"; renderSponsor(); }
 function closeSponsor(){ $("#sponsor").hidden=true; }
-function spHasIntl(){ return !!(SPONSOR.international.paypal || SPONSOR.international.crypto); }
+function spHasIntl(){ return !!(SPONSOR.international.paypal || SPONSOR.international.kofi || SPONSOR.international.crypto); }
 function spAddrRow(label,value,isLink){
   const row=document.createElement("div"); row.className="sp-addr";
   let txt;
@@ -998,6 +998,7 @@ function renderSponsor(){
   }else{
     const row=document.createElement("div");row.className="sp-row";
     if(SPONSOR.international.paypal) row.appendChild(spAddrRow(t("sponsor.paypal"),SPONSOR.international.paypal,true));
+    if(SPONSOR.international.kofi) row.appendChild(spAddrRow(t("sponsor.kofi"),SPONSOR.international.kofi,true));
     if(SPONSOR.international.crypto) row.appendChild(spAddrRow(SPONSOR.international.cryptoLabel||t("sponsor.crypto"),SPONSOR.international.crypto));
     if(!row.children.length){const e=document.createElement("div");e.className="sp-empty";e.textContent=t("sponsor.empty");row.appendChild(e);}
     body.appendChild(row);
