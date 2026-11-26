@@ -300,7 +300,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.23";
+const APP_VERSION="2.24";
 // 标配分类用稳定 ID 存储，显示名随当前语言走 CAT_LABEL 字典；自定义分类存原名
 const PRESET_CATS=["life","family","work","finance"];
 const EXEC_CATS=["personal","family"];
@@ -687,7 +687,7 @@ function switchTab(tab){
   ["home","notes","work","settings"].forEach(t=>$("#view-"+t).hidden=t!==tab);
   document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
   $("#top-title").textContent=t(TITLE_KEY[tab]);
-  $("#top-action").style.display = tab==="home" ? "flex" : "none";
+  $("#top-action").style.display = (tab==="home"||tab==="notes"||tab==="work") ? "flex" : "none";
   $("#top-add").style.display = (tab==="home"||tab==="notes"||tab==="work") ? "flex" : "none";
 }
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
@@ -859,13 +859,14 @@ function renderCatManager(){
       if(categories().includes(name))return toast(t("toast.catExists"));
       state.notes.forEach(n=>{if(n.category===c)n.category=name;});
       state.todos.forEach(t=>{if(t.category===c)t.category=name;});
+      state.workNotes.forEach(w=>{if(w.category===c)w.category=name;});
       if(PRESET_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
       else state.customCats=state.customCats.filter(x=>x!==c);
       if(!PRESET_CATS.includes(name)){ if(!state.customCats.includes(name))state.customCats.push(name); }
       state.retired=state.retired.filter(x=>x!==name);
       state.catOrder=state.catOrder.map(x=>x===c?name:x);
       if(state.filterCat===c)state.filterCat=name;
-      persistRetired(); persistCats(); persistOrder(); persistTodos(); persistNotes(); renderAll(); renderCatManager(); toast(t("toast.renamed"));
+      persistRetired(); persistCats(); persistOrder(); persistTodos(); persistNotes(); persistWork(); renderAll(); renderCatManager(); toast(t("toast.renamed"));
     });
     li.querySelector(".del").addEventListener("click",async()=>{
       const cats=categories();
@@ -875,11 +876,12 @@ function renderCatManager(){
       if(!ok)return;
       state.notes.forEach(n=>{if(n.category===c)n.category=fallback;});
       state.todos.forEach(t=>{if(t.category===c)t.category=fallback;});
+      state.workNotes.forEach(w=>{if(w.category===c)w.category=fallback;});
       if(PRESET_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
       else state.customCats=state.customCats.filter(x=>x!==c);
       state.catOrder=state.catOrder.filter(x=>x!==c);
       if(state.filterCat===c)state.filterCat=fallback;
-      persistRetired(); persistOrder(); persistCats(); persistTodos(); persistNotes(); renderAll(); renderCatManager(); toast(t("toast.catDeleted"));
+      persistRetired(); persistOrder(); persistCats(); persistTodos(); persistNotes(); persistWork(); renderAll(); renderCatManager(); toast(t("toast.catDeleted"));
     });
     list.appendChild(li);
   });
