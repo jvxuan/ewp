@@ -14,12 +14,12 @@ EWP 取自底部导航英文首字母：**E**xecute（执行）/ **W**ork（工�
 
 ## 快速开始
 
-直接用浏览器打开 `notes-app/记事App.html`，或起一个静态服务：
+直接用浏览器打开 `notes-app/index.html`，或起一个静态服务：
 
 ```bash
 cd notes-app
 python3 -m http.server 8011
-# 浏览器访问 http://127.0.0.1:8011/记事App.html
+# 浏览器访问 http://127.0.0.1:8011/index.html
 ```
 
 ## 目录结构
@@ -27,7 +27,7 @@ python3 -m http.server 8011
 ```
 .
 ├── notes-app/
-│   ├── 记事App.html          # 线上主产品：纯前端单文件（入口，所有样式与逻辑内联）
+│   ├── index.html          # 线上主产品：纯前端单文件（入口，所有样式与逻辑内联）
 │   ├── server.py             # 早期全栈原型（Python http.server + SQLite，参考保留，未上线）
 │   ├── static/               # 原型前端静态文件
 │   ├── data/                 # 原型 SQLite 数据库（运行时生成，已 gitignore）
@@ -43,4 +43,4 @@ python3 -m http.server 8011
 
 ## 版本
 
-版本号集中在 `记事App.html` 内的 `APP_VERSION` 常量，关于页由 `APP_NAME` / `APP_VERSION` 渲染。
+版本号集中在 `index.html` 内的 `APP_VERSION` 常量，关于页由 `APP_NAME` / `APP_VERSION` 渲染。
