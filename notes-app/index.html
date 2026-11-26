@@ -103,6 +103,9 @@ button{font-family:inherit;cursor:pointer}
 #view-trash[hidden]{display:none}
 .trash-top-title{font-size:18px;font-weight:700}
 .trash-body{flex:1;overflow-y:auto;padding:12px 12px 18px;display:flex;flex-direction:column;gap:14px}
+.backup-body{flex:1;overflow-y:auto;padding:12px 12px 18px;display:flex;flex-direction:column}
+.backup-body .setting-row:last-child{margin-bottom:0}
+.backup-hint{font-size:12px;color:var(--muted);line-height:1.6;margin-top:4px}
 .title-input{width:100%;font-size:20px;font-weight:700;border:1px solid var(--border);border-radius:12px;outline:none;background:var(--panel);color:var(--text);padding:12px 14px}
 .title-input:focus{border-color:var(--text)}
 .editor-body{flex:1;overflow-y:auto;padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px}
@@ -268,9 +271,11 @@ button{font-family:inherit;cursor:pointer}
       <button class="back-btn" id="backup-back" title="返回">‹</button>
       <span class="trash-top-title" data-i18n="setting.backup">数据备份</span>
     </div>
-    <div class="trash-body">
+    <div class="backup-body">
       <div class="setting-row"><span data-i18n="setting.exportAll">导出全部数据（JSON）</span><button class="btn small" id="btn-export-all" data-i18n="setting.export">导出</button></div>
       <div class="setting-row"><span data-i18n="setting.importAll">导入备份（JSON）</span><button class="btn small" id="btn-import-all" data-i18n="setting.import">导入</button></div>
+      <div class="setting-row"><span data-i18n="setting.mailBackup">发送到邮箱备份</span><button class="btn small" id="btn-mail-backup" data-i18n="setting.mail">发送</button></div>
+      <p class="backup-hint" data-i18n="setting.mailHint">浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。</p>
       <input type="file" id="import-file" accept="application/json,.json" hidden />
     </div>
   </section>
@@ -372,7 +377,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.43";
+const APP_VERSION="2.44";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -403,7 +408,7 @@ const I18N={
     "tab.notes":"执行","tab.work":"工作","tab.home":"支付","tab.settings":"设置",
     "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
     "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
-    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
+    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.mailBackup":"发送到邮箱备份","setting.mail":"发送","setting.mailHint":"浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。","mail.subject":"EWP 数据备份","mail.body":"你好，\n这是 EWP 记事 App 的数据备份。请将随邮件下载的 notes-backup.json 作为附件附上后再发送。","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
     "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanks":"感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
     "cat.all":"总览","cat.uncat":"未分类",
     "empty.homeAll":"还没有待办记录，点右上角 ＋ 新建","empty.homeCat":"该分类暂无待办记录",
@@ -413,7 +418,7 @@ const I18N={
     "toast.storage":"本地存储空间不足，部分内容可能未保存","toast.empty":"内容为空，未保存","toast.saved":"已保存","toast.deleted":"已删除",
     "toast.nfTodo":"未找到该待办","toast.nfNote":"未找到该笔记","toast.nfWork":"未找到该工作记录",
     "toast.nameEmpty":"名称不能为空","toast.catExists":"该分类已存在","toast.oneCat":"至少保留一个分类",
-    "toast.renamed":"已修改","toast.catDeleted":"已删除分类","toast.catAdded":"已添加分类","toast.exported":"已导出全部数据","toast.cleared":"已清空","toast.imported":"已导入备份","toast.badBackup":"备份文件无效",
+    "toast.renamed":"已修改","toast.catDeleted":"已删除分类","toast.catAdded":"已添加分类","toast.exported":"已导出全部数据","toast.cleared":"已清空","toast.imported":"已导入备份","toast.badBackup":"备份文件无效","toast.mailBackup":"已打开邮箱，请附上备份文件",
     "modal.confirm":"确定","modal.cancel":"取消","modal.leave":"离开","modal.clear":"清空",
     "modal.import":"导入备份","modal.importMsg":"导入将覆盖当前本地全部记录，确定继续？",
     "modal.delTodo":"删除待办","modal.delWork":"删除工作记录","modal.delNote":"删除笔记","modal.delConfirm":"确定删除这条记录？此操作不可恢复。",
@@ -427,7 +432,7 @@ const I18N={
     "tab.notes":"Execute","tab.work":"Work","tab.home":"Pay","tab.settings":"Settings",
     "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
     "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
-    "setting.language":"Language","setting.backup":"Data Backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
+    "setting.language":"Language","setting.backup":"Data Backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.mailBackup":"Email backup","setting.mail":"Send","setting.mailHint":"The browser cannot attach files directly: after tapping Send, the backup file downloads first and your mail app opens; attach that JSON manually.","mail.subject":"EWP data backup","mail.body":"Hi,\nThis is the data backup from the EWP app. Please attach the downloaded notes-backup.json before sending.","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
     "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanks":"Thanks for using EWP. If it helps, buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
     "cat.all":"Overview","cat.uncat":"Uncategorized",
     "empty.homeAll":"No todos yet. Tap ＋ top right to add","empty.homeCat":"No todo records in this category",
@@ -437,7 +442,7 @@ const I18N={
     "toast.storage":"Storage full; some changes may not be saved","toast.empty":"Nothing to save","toast.saved":"Saved","toast.deleted":"Deleted",
     "toast.nfTodo":"Todo not found","toast.nfNote":"Note not found","toast.nfWork":"Work record not found",
     "toast.nameEmpty":"Name cannot be empty","toast.catExists":"Category already exists","toast.oneCat":"Keep at least one category",
-    "toast.renamed":"Renamed","toast.catDeleted":"Category deleted","toast.catAdded":"Category added","toast.exported":"All data exported","toast.cleared":"Cleared","toast.imported":"Backup imported","toast.badBackup":"Invalid backup file",
+    "toast.renamed":"Renamed","toast.catDeleted":"Category deleted","toast.catAdded":"Category added","toast.exported":"All data exported","toast.cleared":"Cleared","toast.imported":"Backup imported","toast.badBackup":"Invalid backup file","toast.mailBackup":"Mail app opened; attach the backup file",
     "modal.confirm":"OK","modal.cancel":"Cancel","modal.leave":"Leave","modal.clear":"Clear",
     "modal.import":"Import backup","modal.importMsg":"Importing will overwrite all current local records. Continue?",
     "modal.delTodo":"Delete todo","modal.delWork":"Delete work record","modal.delNote":"Delete note","modal.delConfirm":"Delete this record? This cannot be undone.",
@@ -451,7 +456,7 @@ const I18N={
     "tab.notes":"執行","tab.work":"工作","tab.home":"支付","tab.settings":"設定",
     "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
     "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
-    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
+    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.mailBackup":"寄送到郵箱備份","setting.mail":"寄送","setting.mailHint":"瀏覽器無法直接附加附件：點擊寄送後會先下載備份檔，並開啟郵件用戶端，請手動將該 JSON 作為附件附上。","mail.subject":"EWP 資料備份","mail.body":"你好，\n這是 EWP 記事 App 的資料備份。請將隨郵件下載的 notes-backup.json 作為附件附上後再寄送。","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
     "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanks":"感謝你使用 EWP，若覺得有幫助，歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
     "cat.all":"總覽","cat.uncat":"未分類",
     "empty.homeAll":"還沒有待辦記錄，點右上角 ＋ 新增","empty.homeCat":"該分類尚無待辦記錄",
@@ -461,7 +466,7 @@ const I18N={
     "toast.storage":"本地儲存空間不足，部分內容可能未儲存","toast.empty":"內容為空，未儲存","toast.saved":"已儲存","toast.deleted":"已刪除",
     "toast.nfTodo":"找不到該待辦","toast.nfNote":"找不到該筆記","toast.nfWork":"找不到該工作記錄",
     "toast.nameEmpty":"名稱不能為空","toast.catExists":"該分類已存在","toast.oneCat":"至少保留一個分類",
-    "toast.renamed":"已修改","toast.catDeleted":"已刪除分類","toast.catAdded":"已新增分類","toast.exported":"已匯出全部資料","toast.cleared":"已清空","toast.imported":"已匯入備份","toast.badBackup":"備份檔案無效",
+    "toast.renamed":"已修改","toast.catDeleted":"已刪除分類","toast.catAdded":"已新增分類","toast.exported":"已匯出全部資料","toast.cleared":"已清空","toast.imported":"已匯入備份","toast.badBackup":"備份檔案無效","toast.mailBackup":"已開啟郵箱，請附上備份檔",
     "modal.confirm":"確定","modal.cancel":"取消","modal.leave":"離開","modal.clear":"清空",
     "modal.import":"匯入備份","modal.importMsg":"匯入將覆蓋目前本地全部記錄，確定繼續？",
     "modal.delTodo":"刪除待辦","modal.delWork":"刪除工作記錄","modal.delNote":"刪除筆記","modal.delConfirm":"確定刪除這條記錄？此操作無法復原。",
@@ -1153,10 +1158,19 @@ async function copyText(v){
   }
 }
 
+function backupPayload(){return JSON.stringify({todos:live(state.todos),notes:live(state.notes),workNotes:live(state.workNotes)},null,2);}
 function downloadJson(){
-  const blob=new Blob([JSON.stringify({todos:live(state.todos),notes:live(state.notes),workNotes:live(state.workNotes)},null,2)],{type:"application/json"});
+  const blob=new Blob([backupPayload()],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes-backup.json";a.click();URL.revokeObjectURL(a.href);
   toast(t("toast.exported"));
+}
+function mailBackup(){
+  const blob=new Blob([backupPayload()],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes-backup.json";a.click();URL.revokeObjectURL(a.href);
+  const subject=encodeURIComponent(t("mail.subject"));
+  const body=encodeURIComponent(t("mail.body"));
+  window.location.href="mailto:?subject="+subject+"&body="+body;
+  toast(t("toast.mailBackup"));
 }
 function importBackup(file){
   if(!file)return;
@@ -1231,6 +1245,7 @@ function bind(){
   $("#btn-delete").addEventListener("click",deleteCurrent);
   $("#btn-export-all").addEventListener("click",downloadJson);
   $("#btn-import-all").addEventListener("click",()=>$("#import-file").click());
+  $("#btn-mail-backup").addEventListener("click",mailBackup);
   $("#import-file").addEventListener("change",e=>{importBackup(e.target.files[0]);e.target.value="";});
 
   $("#note-title").addEventListener("input",()=>{state.dirty=true;});
