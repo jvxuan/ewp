@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>EWP</title>
+<title>PEW</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d0d0d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='3.5' width='14' height='17' rx='2'/><path d='M9 8h6M9 12h6'/></svg>" />
 <style>
 :root{
@@ -198,7 +198,7 @@ button{font-family:inherit;cursor:pointer}
 .todo-row.done{background:var(--done-soft)}
 .todo-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--text)}
 .tr-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
-.tr-cat{flex-shrink:0;width:56px;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden}
+.tr-cat{flex-shrink:0;width:auto;font-size:12px;color:var(--muted);text-align:left;margin-top:5px}
 .todo-row .tr-body{flex:1;min-width:0}
 .todo-row .tr-text{font-size:15px;word-break:break-word}
 .tr-note{font-size:12.5px;color:var(--muted);word-break:break-word;margin-top:3px}
@@ -311,9 +311,9 @@ button{font-family:inherit;cursor:pointer}
   </section>
 
   <nav class="tabbar" id="main-tabbar">
-    <button class="tab active" data-tab="notes"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5l1.4 1.4L11 7.5M8 13.5l1.4 1.4L11 12.5M14.5 8.5H17M14.5 13.5H17"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="4" y="3.5" width="16" height="17" rx="2" fill="#E8B547" stroke="#0d0d0d" stroke-width="1.6"/><path d="M8 8.6l1.3 1.3 1.9-2.1" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13.6l1.3 1.3 1.9-2.1" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.6 8.6h2.4M14.6 13.6h2.4" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round"/></svg></span><span data-i18n="tab.notes">执行</span></button>
+    <button class="tab active" data-tab="home"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M16 12.5h.01"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5" fill="#E8B547" stroke="#0d0d0d" stroke-width="1.6"/><path d="M3.5 9.5h17" stroke="#0d0d0d" stroke-width="1.6"/><circle cx="16" cy="14" r="1.3" fill="#0d0d0d"/></svg></span><span data-i18n="tab.home">支付</span></button>
+    <button class="tab" data-tab="notes"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5l1.4 1.4L11 7.5M8 13.5l1.4 1.4L11 12.5M14.5 8.5H17M14.5 13.5H17"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="4" y="3.5" width="16" height="17" rx="2" fill="#E8B547" stroke="#0d0d0d" stroke-width="1.6"/><path d="M8 8.6l1.3 1.3 1.9-2.1" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13.6l1.3 1.3 1.9-2.1" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.6 8.6h2.4M14.6 13.6h2.4" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round"/></svg></span><span data-i18n="tab.notes">执行</span></button>
     <button class="tab" data-tab="work"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5v2M3.5 12h17"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="7.5" width="17" height="12" rx="2" fill="#E8B547" stroke="#0d0d0d" stroke-width="1.6"/><path d="M9 7.5V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5v2" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" fill="none"/><path d="M3.5 12h17" stroke="#0d0d0d" stroke-width="1.6"/></svg></span><span data-i18n="tab.work">工作</span></button>
-    <button class="tab" data-tab="home"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M16 12.5h.01"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5" fill="#E8B547" stroke="#0d0d0d" stroke-width="1.6"/><path d="M3.5 9.5h17" stroke="#0d0d0d" stroke-width="1.6"/><circle cx="16" cy="14" r="1.3" fill="#0d0d0d"/></svg></span><span data-i18n="tab.home">支付</span></button>
     <button class="tab" data-tab="settings"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" fill="#E8B547" stroke="#0d0d0d" stroke-width="1.4" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.2" fill="#fff" stroke="#0d0d0d" stroke-width="1.5"/></svg></span><span data-i18n="tab.settings">设置</span></button>
   </nav>
 
@@ -421,8 +421,8 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const CONSENT_KEY="notes-app-v1-consent";
-const APP_NAME="EWP";
-const APP_VERSION="2.54";
+const APP_NAME="PEW";
+const APP_VERSION="2.56";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -453,10 +453,10 @@ const I18N={
     "tab.notes":"执行","tab.work":"工作","tab.home":"支付","tab.settings":"设置",
     "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
     "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
-    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.mailBackup":"发送到邮箱备份","setting.mail":"发送","setting.mailHint":"浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。","mail.subject":"EWP 数据备份","mail.body":"你好，\n这是 EWP 记事 App 的数据备份。请将随邮件下载的 notes-backup.json 作为附件附上后再发送。","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于","setting.privacy":"隐私政策","setting.cloudSync":"同步到云端","common.comingSoon":"开发中",
-    "privacy.title":"隐私政策","privacy.summary":"EWP 是一款本地待办与记录工具，不要求注册账号，你的记录默认只保存在本机，不上传云端。请阅读并同意隐私政策后继续使用。",
+    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.mailBackup":"发送到邮箱备份","setting.mail":"发送","setting.mailHint":"浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。","mail.subject":"PEW 数据备份","mail.body":"你好，\n这是 PEW 记事 App 的数据备份。请将随邮件下载的 notes-backup.json 作为附件附上后再发送。","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于","setting.privacy":"隐私政策","setting.cloudSync":"同步到云端","common.comingSoon":"开发中",
+    "privacy.title":"隐私政策","privacy.summary":"PEW 是一款本地待办与记录工具，不要求注册账号，你的记录默认只保存在本机，不上传云端。请阅读并同意隐私政策后继续使用。",
     "consent.agree":"同意并继续","consent.decline":"拒绝","consent.declineNotice":"同意隐私政策后才能使用本应用","consent.readMore":"查看完整隐私政策",
-    "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanksMain":"感谢你使用 EWP，若觉得有帮助，","sponsor.thanksCta":"欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
+    "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanksMain":"感谢你使用 PEW，若觉得有帮助，","sponsor.thanksCta":"欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
     "cat.all":"总览","cat.uncat":"未分类",
     "empty.homeAll":"暂无记录","empty.homeCat":"该分类暂无记录",
     "empty.notesAll":"暂无记录","empty.notesCat":"该分类暂无记录",
@@ -479,10 +479,10 @@ const I18N={
     "tab.notes":"Execute","tab.work":"Work","tab.home":"Pay","tab.settings":"Settings",
     "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
     "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
-    "setting.language":"Language","setting.backup":"Data backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.mailBackup":"Email backup","setting.mail":"Send","setting.mailHint":"The browser cannot attach files directly: after tapping Send, the backup file downloads first and your mail app opens; attach that JSON manually.","mail.subject":"EWP data backup","mail.body":"Hi,\nThis is the data backup from the EWP app. Please attach the downloaded notes-backup.json before sending.","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About","setting.privacy":"Privacy Policy","setting.cloudSync":"Cloud sync","common.comingSoon":"Coming soon",
-    "privacy.title":"Privacy Policy","privacy.summary":"EWP is a local todo and notes tool that does not require an account. Your records are kept only on this device by default and are not uploaded to the cloud. Please review and agree to the privacy policy to continue.",
+    "setting.language":"Language","setting.backup":"Data backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.mailBackup":"Email backup","setting.mail":"Send","setting.mailHint":"The browser cannot attach files directly: after tapping Send, the backup file downloads first and your mail app opens; attach that JSON manually.","mail.subject":"PEW data backup","mail.body":"Hi,\nThis is the data backup from the PEW app. Please attach the downloaded notes-backup.json before sending.","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About","setting.privacy":"Privacy Policy","setting.cloudSync":"Cloud sync","common.comingSoon":"Coming soon",
+    "privacy.title":"Privacy Policy","privacy.summary":"PEW is a local todo and notes tool that does not require an account. Your records are kept only on this device by default and are not uploaded to the cloud. Please review and agree to the privacy policy to continue.",
     "consent.agree":"Agree and continue","consent.decline":"Decline","consent.declineNotice":"You must agree to the privacy policy to use this app","consent.readMore":"Read full privacy policy",
-    "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanksMain":"Thanks for using EWP. If it helps, ","sponsor.thanksCta":"buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
+    "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanksMain":"Thanks for using PEW. If it helps, ","sponsor.thanksCta":"buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
     "cat.all":"Overview","cat.uncat":"Uncategorized",
     "empty.homeAll":"No records yet.","empty.homeCat":"No records in this category.",
     "empty.notesAll":"No records yet.","empty.notesCat":"No records in this category.",
@@ -505,10 +505,10 @@ const I18N={
     "tab.notes":"執行","tab.work":"工作","tab.home":"支付","tab.settings":"設定",
     "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
     "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
-    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.mailBackup":"寄送到郵箱備份","setting.mail":"寄送","setting.mailHint":"瀏覽器無法直接附加附件：點擊寄送後會先下載備份檔，並開啟郵件用戶端，請手動將該 JSON 作為附件附上。","mail.subject":"EWP 資料備份","mail.body":"你好，\n這是 EWP 記事 App 的資料備份。請將隨郵件下載的 notes-backup.json 作為附件附上後再寄送。","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於","setting.privacy":"隱私政策","setting.cloudSync":"同步到雲端","common.comingSoon":"開發中",
-    "privacy.title":"隱私政策","privacy.summary":"EWP 是一款本地待辦與記錄工具，不需註冊帳號，你的記錄預設只儲存在本機，不會上傳雲端。請閱讀並同意隱私政策後繼續使用。",
+    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.mailBackup":"寄送到郵箱備份","setting.mail":"寄送","setting.mailHint":"瀏覽器無法直接附加附件：點擊寄送後會先下載備份檔，並開啟郵件用戶端，請手動將該 JSON 作為附件附上。","mail.subject":"PEW 資料備份","mail.body":"你好，\n這是 PEW 記事 App 的資料備份。請將隨郵件下載的 notes-backup.json 作為附件附上後再寄送。","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於","setting.privacy":"隱私政策","setting.cloudSync":"同步到雲端","common.comingSoon":"開發中",
+    "privacy.title":"隱私政策","privacy.summary":"PEW 是一款本地待辦與記錄工具，不需註冊帳號，你的記錄預設只儲存在本機，不會上傳雲端。請閱讀並同意隱私政策後繼續使用。",
     "consent.agree":"同意並繼續","consent.decline":"拒絕","consent.declineNotice":"同意隱私政策後才能使用本應用程式","consent.readMore":"檢視完整隱私政策",
-    "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanksMain":"感謝你使用 EWP，若覺得有幫助，","sponsor.thanksCta":"歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
+    "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanksMain":"感謝你使用 PEW，若覺得有幫助，","sponsor.thanksCta":"歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
     "cat.all":"總覽","cat.uncat":"未分類",
     "empty.homeAll":"尚無記錄","empty.homeCat":"該分類尚無記錄",
     "empty.notesAll":"尚無記錄","empty.notesCat":"該分類尚無記錄",
@@ -530,7 +530,7 @@ const I18N={
 };
 const PRIVACY={
   zh:{
-    intro:"本政策说明 EWP（以下简称“本应用”）在使用过程中对信息的处理方式。本应用是一款本地待办与记录工具，我们尽量减少对个人信息的收集。",
+    intro:"本政策说明 PEW（以下简称“本应用”）在使用过程中对信息的处理方式。本应用是一款本地待办与记录工具，我们尽量减少对个人信息的收集。",
     sections:[
       {h:"我们收集和存储的信息", items:[
         "本应用不要求注册账号，不收集姓名、手机号、身份证号等身份信息。",
@@ -557,7 +557,7 @@ const PRIVACY={
     contact:"联系邮箱：【待填写】"
   },
   en:{
-    intro:"This policy explains how EWP (the “App”) handles information. The App is a local todo and notes tool designed to collect as little personal information as possible.",
+    intro:"This policy explains how PEW (the “App”) handles information. The App is a local todo and notes tool designed to collect as little personal information as possible.",
     sections:[
       {h:"Information we collect and store", items:[
         "The App does not require an account and does not collect identity details such as your name, phone number, or ID number.",
@@ -584,7 +584,7 @@ const PRIVACY={
     contact:"Contact email: [to be provided]"
   },
   zhTW:{
-    intro:"本政策說明 EWP（以下簡稱「本應用」）在使用過程中對資訊的處理方式。本應用是一款本地待辦與記錄工具，我們盡量減少對個人資訊的收集。",
+    intro:"本政策說明 PEW（以下簡稱「本應用」）在使用過程中對資訊的處理方式。本應用是一款本地待辦與記錄工具，我們盡量減少對個人資訊的收集。",
     sections:[
       {h:"我們收集和儲存的資訊", items:[
         "本應用不要求註冊帳號，不收集姓名、手機號碼、身分證字號等身分資訊。",
@@ -621,7 +621,7 @@ const state={
   todos:[], notes:[], workNotes:[], customCats:[], catOrder:[], retired:[],
   currentKind:null, currentId:null, currentItem:null,
   draft:{category:""},
-  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, trashFilter:"note", trashFrom:"settings", backupFrom:"settings", privacyFrom:"settings", dirty:false, editorFrom:"notes",
+  tab:"home", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, trashFilter:"note", trashFrom:"settings", backupFrom:"settings", privacyFrom:"settings", dirty:false, editorFrom:"notes",
   lang:(load(LANG_KEY)||"zh")
 };
 
@@ -754,12 +754,12 @@ function bindCard(box,n,onClick,persistFn,idx,overview,cat){
   const card=document.createElement("div");
   card.className="note-card"+(overview||idx===0?" first":"")+(overview?" overview":"")+(n.done?" done":"");
   const left=overview
-    ? `<span class="nc-cat-label">${esc(catLabel(cat))}</span>`
+    ? ""
     : `<span class="nc-index">${idx+1}</span>`;
   const check=overview?"":`<input type="checkbox" ${n.done?"checked":""}/>`;
   card.innerHTML=`
     ${left}
-    <div class="nc-body">${cardHtml(n,true)}</div>
+    <div class="nc-body">${cardHtml(n,!overview)}</div>
     ${check}`;
   const cb=card.querySelector("input");
   if(cb) cb.addEventListener("change",e=>{
@@ -856,12 +856,12 @@ function renderHomeList(){
     const row=document.createElement("div");
     row.className="todo-row"+(overview?" overview":"")+(t.done?" done":"")+((overview||idx===0)?" first":"");
     const left=overview
-      ? `<span class="tr-cat">${esc(catLabel(cat))}</span>`
+      ? ""
       : `<span class="tr-index">${idx+1}</span>`;
     const check=overview?"":`<input type="checkbox" ${t.done?"checked":""}/>`;
     row.innerHTML=`
       ${left}
-      <div class="tr-body"><div class="tr-text">${esc(t.text)}</div>${t.note?`<div class="tr-note">${esc(t.note)}</div>`:""}</div>
+      <div class="tr-body"><div class="tr-text">${esc(t.text)}</div>${t.note?`<div class="tr-note">${esc(t.note)}</div>`:""}${overview?`<div class="tr-cat">${esc(catLabel(cat))}</div>`:""}</div>
       ${check}`;
     const boxInput=row.querySelector("input");
     if(boxInput) boxInput.addEventListener("change",e=>{
@@ -1485,7 +1485,7 @@ function init(){
   $("#about-ver").textContent=`${APP_NAME} v${APP_VERSION}`;
   applyStaticText();
   renderAll();
-  switchTab("notes");
+  switchTab("home");
   if(load(CONSENT_KEY)!=="agreed") openConsent();
 }
 init();
