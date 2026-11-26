@@ -48,7 +48,7 @@ button{font-family:inherit;cursor:pointer}
 .note-list{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
 
 .note-card{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;cursor:pointer}
-.note-card:hover{background:var(--primary-soft)}
+.note-card:hover{border-color:#3d3d3d !important}
 .note-card.done{background:var(--done-soft)}
 .note-card .nc-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
 .note-card .nc-body{flex:1;min-width:0}
@@ -169,6 +169,7 @@ button{font-family:inherit;cursor:pointer}
 
 /* 主页待办条目 */
 .todo-row{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 12px;cursor:pointer}
+.todo-row:hover{border-color:#3d3d3d !important}
 .todo-row.done{background:var(--done-soft)}
 .todo-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--text)}
 .tr-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
@@ -349,7 +350,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.36";
+const APP_VERSION="2.37";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
