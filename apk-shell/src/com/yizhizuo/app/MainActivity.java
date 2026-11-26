@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
 
     private static final int BG = 0xFFF7F7F8;
     private static final String HOME_URL =
-        "https://ecnowzybo7p7.doubao.link/app/app_17jpdajdc3q";
+        "file:///android_asset/index.html";
 
     private WebView web;
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy ALL_PROXY all_proxy PROXY
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export JAVA_HOME=/home/user/Doubao/chats/38456277170402306/.tools/jdk-11.0.33.1+1
 export PATH=$JAVA_HOME/bin:$PATH
 BT=$HOME/android-sdk/build-tools/34.0.0
 AJAR=$HOME/android-sdk/platforms/android-34/android.jar
@@ -10,7 +10,7 @@ rm -rf build/gen build/classes build/dex build/res.zip build/base.apk build/unsi
 mkdir -p build/gen build/classes build/dex
 
 $BT/aapt2 compile --dir res -o build/res.zip
-$BT/aapt2 link -I "$AJAR" --manifest AndroidManifest.xml -o build/base.apk --java build/gen build/res.zip
+$BT/aapt2 link -I "$AJAR" --manifest AndroidManifest.xml -A assets -o build/base.apk --java build/gen build/res.zip
 
 javac -cp "$AJAR" -d build/classes \
   src/com/yizhizuo/app/MainActivity.java build/gen/com/yizhizuo/app/R.java

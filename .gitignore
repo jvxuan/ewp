@@ -18,3 +18,7 @@ __pycache__/
 
 # 系统文件
 .DS_Store
+
+# 便携 JDK 与 APK 内置 HTML 临时产物
+.tools/
+apk-shell/assets/
