@@ -41,8 +41,9 @@ button{font-family:inherit;cursor:pointer}
 .cat-item .cat-icon svg{width:16px;height:16px;display:block}
 .cat-item .cat-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cat-item.no-icon .cat-name{padding-left:20px;text-align:left}
+.cat-item.cat-all .cat-name{font-size:12px}
 .cat-item:hover{background:var(--primary-soft);color:var(--text)}
-.cat-item.active{background:var(--primary-soft);color:var(--text);font-weight:600}
+.cat-item.active{background:var(--primary-soft);color:var(--text)}
 
 .note-pane{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
 .pane-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
@@ -413,7 +414,7 @@ const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const CONSENT_KEY="notes-app-v1-consent";
 const APP_NAME="EWP";
-const APP_VERSION="2.47";
+const APP_VERSION="2.48";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -765,7 +766,7 @@ const GRIP_SVG=`<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="
 function renderCatBar(){
   const bar=$("#cat-bar"); bar.innerHTML="";
   const all=document.createElement("button");
-  all.className="cat-item no-icon"+(state.filterCat===ALL_CAT?" active":"");
+  all.className="cat-item no-icon cat-all"+(state.filterCat===ALL_CAT?" active":"");
   all.innerHTML=`<span class="cat-name">${t("cat.all")}</span>`;
   all.title=t("cat.all");
   all.addEventListener("click",()=>{state.filterCat=ALL_CAT;renderCatBar();renderHomeList();});
@@ -865,7 +866,7 @@ function renderHomeList(){
 function renderSideBar(barId,cats,filterKey,listRender){
   const bar=$(barId); bar.innerHTML="";
   const all=document.createElement("button");
-  all.className="cat-item no-icon"+(state[filterKey]===ALL_CAT?" active":"");
+  all.className="cat-item no-icon cat-all"+(state[filterKey]===ALL_CAT?" active":"");
   all.innerHTML=`<span class="cat-name">${t("cat.all")}</span>`;
   all.title=t("cat.all");
   all.addEventListener("click",()=>{state[filterKey]=ALL_CAT;renderSideBar(barId,cats,filterKey,listRender);listRender();});
