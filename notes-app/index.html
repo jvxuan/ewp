@@ -349,7 +349,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.35";
+const APP_VERSION="2.36";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -597,7 +597,7 @@ function bindCard(box,n,onClick,persistFn,idx,overview,cat){
   const check=overview?"":`<input type="checkbox" ${n.done?"checked":""}/>`;
   card.innerHTML=`
     ${left}
-    <div class="nc-body">${cardHtml(n,overview)}</div>
+    <div class="nc-body">${cardHtml(n,true)}</div>
     ${check}`;
   const cb=card.querySelector("input");
   if(cb) cb.addEventListener("change",e=>{
