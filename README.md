@@ -22,6 +22,15 @@ python3 -m http.server 8011
 # 浏览器访问 http://127.0.0.1:8011/index.html
 ```
 
+## 下载 Android APK
+
+调试签名包（minSdk 21 / targetSdk 34，应用名 EWP v2.21）：
+
+- [Release 页面](https://github.com/jvxuan/ewp/releases/tag/v2.21)
+- [直接下载 EWP-debug-v2.21.apk](https://github.com/jvxuan/ewp/releases/download/v2.21/EWP-debug-v2.21.apk)
+
+> 套壳 WebView 加载线上公网页面，壳内内容随线上版本更新；调试签名安装时可能需允许「未知来源」。
+
 ## 目录结构
 
 ```
