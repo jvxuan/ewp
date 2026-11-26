@@ -106,6 +106,14 @@ button{font-family:inherit;cursor:pointer}
 .backup-body{flex:1;overflow-y:auto;padding:12px 12px 18px;display:flex;flex-direction:column}
 .backup-body .setting-row:last-child{margin-bottom:0}
 .backup-hint{font-size:12px;color:var(--muted);line-height:1.6;margin-top:4px}
+.privacy-body{flex:1;overflow-y:auto;padding:14px 16px 24px;display:flex;flex-direction:column;gap:12px}
+.privacy-body h2{font-size:15px;margin:4px 0 2px}
+.privacy-body p{font-size:13.5px;line-height:1.7}
+.privacy-body ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.privacy-body li{font-size:13.5px;line-height:1.7}
+.privacy-body .privacy-contact{color:var(--muted);font-size:13px}
+.consent-links{display:flex;justify-content:center}
+.btn-link{border:none;background:none;color:var(--primary);font-size:13px;padding:4px 6px;cursor:pointer}
 .title-input{width:100%;font-size:20px;font-weight:700;border:1px solid var(--border);border-radius:12px;outline:none;background:var(--panel);color:var(--text);padding:12px 14px}
 .title-input:focus{border-color:var(--text)}
 .editor-body{flex:1;overflow-y:auto;padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px}
@@ -249,6 +257,7 @@ button{font-family:inherit;cursor:pointer}
     <div class="setting-row"><span data-i18n="setting.backup">数据备份</span><button class="btn small" id="btn-backup" data-i18n="trash.manage">查看</button></div>
     <div class="setting-row"><span data-i18n="setting.trash">回收站</span><button class="btn small" id="btn-trash" data-i18n="trash.manage">查看</button></div>
     <div class="setting-row"><span data-i18n="setting.sponsor">赞助支持</span><button class="btn small" id="btn-sponsor" data-i18n="sponsor.support">支持</button></div>
+    <div class="setting-row"><span data-i18n="setting.privacy">隐私政策</span><button class="btn small" id="btn-privacy" data-i18n="trash.manage">查看</button></div>
     <div class="setting-row"><span data-i18n="setting.about">关于</span><span id="about-ver" style="color:var(--muted);font-size:13px"></span></div>
   </section>
 
@@ -278,6 +287,15 @@ button{font-family:inherit;cursor:pointer}
       <p class="backup-hint" data-i18n="setting.mailHint">浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。</p>
       <input type="file" id="import-file" accept="application/json,.json" hidden />
     </div>
+  </section>
+
+  <!-- 隐私政策（独立页面，带返回） -->
+  <section id="view-privacy" hidden>
+    <div class="editor-top">
+      <button class="back-btn" id="privacy-back" title="返回">‹</button>
+      <span class="trash-top-title" data-i18n="privacy.title">隐私政策</span>
+    </div>
+    <div class="privacy-body" id="privacy-body"></div>
   </section>
 
   <nav class="tabbar" id="main-tabbar">
@@ -361,6 +379,20 @@ button{font-family:inherit;cursor:pointer}
       <button class="btn" id="sp-close" data-i18n="drawer.done">完成</button>
     </div>
   </div>
+
+  <!-- 首次启动隐私同意弹窗 -->
+  <div id="consent" hidden>
+    <div class="modal-mask" id="consent-mask"></div>
+    <div class="modal">
+      <h4 class="modal-title" data-i18n="privacy.title">隐私政策</h4>
+      <p class="modal-msg" id="consent-summary"></p>
+      <div class="consent-links"><button class="btn-link" id="consent-open-privacy" data-i18n="consent.readMore">查看完整隐私政策</button></div>
+      <div class="modal-actions">
+        <button class="btn" id="consent-decline" data-i18n="consent.decline">拒绝</button>
+        <button class="btn primary" id="consent-agree" data-i18n="consent.agree">同意并继续</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="toast" class="toast" hidden></div>
@@ -376,8 +408,9 @@ const OLD_KEY="notes-app-v1";
 const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
+const CONSENT_KEY="notes-app-v1-consent";
 const APP_NAME="EWP";
-const APP_VERSION="2.44";
+const APP_VERSION="2.45";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -408,7 +441,9 @@ const I18N={
     "tab.notes":"执行","tab.work":"工作","tab.home":"支付","tab.settings":"设置",
     "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
     "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
-    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.mailBackup":"发送到邮箱备份","setting.mail":"发送","setting.mailHint":"浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。","mail.subject":"EWP 数据备份","mail.body":"你好，\n这是 EWP 记事 App 的数据备份。请将随邮件下载的 notes-backup.json 作为附件附上后再发送。","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于",
+    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.mailBackup":"发送到邮箱备份","setting.mail":"发送","setting.mailHint":"浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。","mail.subject":"EWP 数据备份","mail.body":"你好，\n这是 EWP 记事 App 的数据备份。请将随邮件下载的 notes-backup.json 作为附件附上后再发送。","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于","setting.privacy":"隐私政策",
+    "privacy.title":"隐私政策","privacy.summary":"EWP 是一款本地待办与记录工具，不要求注册账号，你的记录默认只保存在本机，不上传云端。请阅读并同意隐私政策后继续使用。",
+    "consent.agree":"同意并继续","consent.decline":"拒绝","consent.declineNotice":"同意隐私政策后才能使用本应用","consent.readMore":"查看完整隐私政策",
     "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanks":"感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
     "cat.all":"总览","cat.uncat":"未分类",
     "empty.homeAll":"还没有待办记录，点右上角 ＋ 新建","empty.homeCat":"该分类暂无待办记录",
@@ -432,7 +467,9 @@ const I18N={
     "tab.notes":"Execute","tab.work":"Work","tab.home":"Pay","tab.settings":"Settings",
     "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
     "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
-    "setting.language":"Language","setting.backup":"Data Backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.mailBackup":"Email backup","setting.mail":"Send","setting.mailHint":"The browser cannot attach files directly: after tapping Send, the backup file downloads first and your mail app opens; attach that JSON manually.","mail.subject":"EWP data backup","mail.body":"Hi,\nThis is the data backup from the EWP app. Please attach the downloaded notes-backup.json before sending.","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About",
+    "setting.language":"Language","setting.backup":"Data Backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.mailBackup":"Email backup","setting.mail":"Send","setting.mailHint":"The browser cannot attach files directly: after tapping Send, the backup file downloads first and your mail app opens; attach that JSON manually.","mail.subject":"EWP data backup","mail.body":"Hi,\nThis is the data backup from the EWP app. Please attach the downloaded notes-backup.json before sending.","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About","setting.privacy":"Privacy Policy",
+    "privacy.title":"Privacy Policy","privacy.summary":"EWP is a local todo and notes tool that does not require an account. Your records are kept only on this device by default and are not uploaded to the cloud. Please review and agree to the privacy policy to continue.",
+    "consent.agree":"Agree and continue","consent.decline":"Decline","consent.declineNotice":"You must agree to the privacy policy to use this app","consent.readMore":"Read full privacy policy",
     "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanks":"Thanks for using EWP. If it helps, buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
     "cat.all":"Overview","cat.uncat":"Uncategorized",
     "empty.homeAll":"No todos yet. Tap ＋ top right to add","empty.homeCat":"No todo records in this category",
@@ -456,7 +493,9 @@ const I18N={
     "tab.notes":"執行","tab.work":"工作","tab.home":"支付","tab.settings":"設定",
     "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
     "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
-    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.mailBackup":"寄送到郵箱備份","setting.mail":"寄送","setting.mailHint":"瀏覽器無法直接附加附件：點擊寄送後會先下載備份檔，並開啟郵件用戶端，請手動將該 JSON 作為附件附上。","mail.subject":"EWP 資料備份","mail.body":"你好，\n這是 EWP 記事 App 的資料備份。請將隨郵件下載的 notes-backup.json 作為附件附上後再寄送。","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於",
+    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.mailBackup":"寄送到郵箱備份","setting.mail":"寄送","setting.mailHint":"瀏覽器無法直接附加附件：點擊寄送後會先下載備份檔，並開啟郵件用戶端，請手動將該 JSON 作為附件附上。","mail.subject":"EWP 資料備份","mail.body":"你好，\n這是 EWP 記事 App 的資料備份。請將隨郵件下載的 notes-backup.json 作為附件附上後再寄送。","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於","setting.privacy":"隱私政策",
+    "privacy.title":"隱私政策","privacy.summary":"EWP 是一款本地待辦與記錄工具，不需註冊帳號，你的記錄預設只儲存在本機，不會上傳雲端。請閱讀並同意隱私政策後繼續使用。",
+    "consent.agree":"同意並繼續","consent.decline":"拒絕","consent.declineNotice":"同意隱私政策後才能使用本應用程式","consent.readMore":"檢視完整隱私政策",
     "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanks":"感謝你使用 EWP，若覺得有幫助，歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
     "cat.all":"總覽","cat.uncat":"未分類",
     "empty.homeAll":"還沒有待辦記錄，點右上角 ＋ 新增","empty.homeCat":"該分類尚無待辦記錄",
@@ -477,6 +516,89 @@ const I18N={
     "setting.trash":"回收筒","trash.manage":"檢視","trash.restore":"還原","trash.forever":"永久刪除","trash.empty":"回收筒為空","trash.emptyBin":"清空回收筒","trash.emptyMsg":"將永久刪除回收筒中的全部記錄？此操作無法復原。","trash.foreverMsg":"將永久刪除這條記錄？此操作無法復原。","toast.restored":"已還原"
   }
 };
+const PRIVACY={
+  zh:{
+    intro:"本政策说明 EWP（以下简称“本应用”）在使用过程中对信息的处理方式。本应用是一款本地待办与记录工具，我们尽量减少对个人信息的收集。",
+    sections:[
+      {h:"我们收集和存储的信息", items:[
+        "本应用不要求注册账号，不收集姓名、手机号、身份证号等身份信息。",
+        "你手动录入的待办、笔记、工作记录、备注及分类等内容，仅保存在当前设备的本地存储（localStorage）中，默认不上传服务器。",
+        "本应用不主动读取设备的通讯录、相册、文件、位置、麦克风或设备标识符。"
+      ]},
+      {h:"申请的系统权限", items:[
+        "网络访问权限：用于加载应用页面所需内容。",
+        "未申请定位、相机、相册/存储读取、通讯录、麦克风、传感器、推送通知等敏感权限。"
+      ]},
+      {h:"第三方服务与外链", items:[
+        "应用自身未集成统计分析、推送、崩溃上报或广告类第三方 SDK。",
+        "赞助页面可能包含 PayPal、Ko-fi 等外部链接，跳转后由对应第三方页面及其隐私政策约束。"
+      ]},
+      {h:"数据备份、导出与删除", items:[
+        "可通过“数据备份”将全部本地记录导出为 JSON 文件自行留存，也可从备份文件导入恢复。",
+        "可通过邮件客户端把备份文件发送到自己的邮箱；备份文件由你自行保存，本应用不代收发邮件。",
+        "删除记录先进入回收站，可恢复或彻底删除；卸载应用将清除设备上保存的本地数据。"
+      ]},
+      {h:"未成年人保护", items:[
+        "本应用不含社交、私信或公开发布功能；未成年人应在监护人指导下使用。"
+      ]}
+    ],
+    contact:"联系邮箱：【待填写】"
+  },
+  en:{
+    intro:"This policy explains how EWP (the “App”) handles information. The App is a local todo and notes tool designed to collect as little personal information as possible.",
+    sections:[
+      {h:"Information we collect and store", items:[
+        "The App does not require an account and does not collect identity details such as your name, phone number, or ID number.",
+        "Todos, notes, work records, remarks, and categories you enter are stored only in your device’s local storage (localStorage) and are not uploaded to a server by default.",
+        "The App does not actively read your contacts, photos, files, location, microphone, or device identifiers."
+      ]},
+      {h:"System permissions", items:[
+        "Network access: used to load the app’s page content.",
+        "No location, camera, photos/storage, contacts, microphone, sensors, or push notification permissions are requested."
+      ]},
+      {h:"Third-party services and links", items:[
+        "The App does not integrate analytics, push, crash reporting, or advertising SDKs.",
+        "The sponsor page may include external links to PayPal, Ko-fi, or similar services; after tapping through, that third party’s own privacy policy applies."
+      ]},
+      {h:"Backup, export, and deletion", items:[
+        "You can export all local records as a JSON backup file or restore from one.",
+        "You can email the backup through your own mail app; the App does not send or receive mail on your behalf.",
+        "Deleted records go to the trash first and can be restored or permanently removed; uninstalling the App clears the local data on your device."
+      ]},
+      {h:"Minors", items:[
+        "The App has no social, messaging, or public posting features; minors should use it under guardian supervision."
+      ]}
+    ],
+    contact:"Contact email: [to be provided]"
+  },
+  zhTW:{
+    intro:"本政策說明 EWP（以下簡稱「本應用」）在使用過程中對資訊的處理方式。本應用是一款本地待辦與記錄工具，我們盡量減少對個人資訊的收集。",
+    sections:[
+      {h:"我們收集和儲存的資訊", items:[
+        "本應用不要求註冊帳號，不收集姓名、手機號碼、身分證字號等身分資訊。",
+        "你手動輸入的待辦、筆記、工作記錄、備註及分類等內容，僅儲存在目前裝置的本機儲存（localStorage）中，預設不上傳伺服器。",
+        "本應用不主動讀取裝置的通訊錄、相片、檔案、位置、麥克風或裝置識別碼。"
+      ]},
+      {h:"申請的系統權限", items:[
+        "網路存取權限：用於載入應用頁面所需內容。",
+        "未申請定位、相機、相片/儲存讀取、通訊錄、麥克風、感測器、推送通知等敏感權限。"
+      ]},
+      {h:"第三方服務與外部連結", items:[
+        "應用自身未整合統計分析、推送、當機回報或廣告類第三方 SDK。",
+        "贊助頁面可能包含 PayPal、Ko-fi 等外部連結，跳轉後由對應第三方頁面及其隱私政策約束。"
+      ]},
+      {h:"資料備份、匯出與刪除", items:[
+        "可透過「資料備份」將全部本機記錄匯出為 JSON 檔案自行留存，也可從備份檔案匯入還原。",
+        "可透過郵件用戶端把備份檔案寄到自己的信箱；備份檔案由你自行保存，本應用不代為收發郵件。",
+        "刪除記錄先進入回收筒，可還原或永久刪除；解除安裝應用將清除裝置上儲存的本機資料。"
+      ]},
+      {h:"未成年人保護", items:[
+        "本應用不含社交、私信或公開發布功能；未成年人應在監護人指導下使用。"
+      ]}
+    ],
+    contact:"聯絡信箱：【待填寫】"
+  }
+};
 function t(key,vars){
   const lang=state.lang||"zh";
   let s=(I18N[lang]&&I18N[lang][key])||I18N.zh[key]||key;
@@ -487,7 +609,7 @@ const state={
   todos:[], notes:[], workNotes:[], customCats:[], catOrder:[], retired:[],
   currentKind:null, currentId:null, currentItem:null,
   draft:{category:""},
-  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, trashFilter:"note", trashFrom:"settings", backupFrom:"settings", dirty:false, editorFrom:"notes",
+  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, trashFilter:"note", trashFrom:"settings", backupFrom:"settings", privacyFrom:"settings", dirty:false, editorFrom:"notes",
   lang:(load(LANG_KEY)||"zh")
 };
 
@@ -989,6 +1111,41 @@ function closeBackup(){
   $("#main-tabbar").hidden=false;
   switchTab(state.backupFrom||"settings");
 }
+
+/* ---------- 隐私政策 ---------- */
+function renderPrivacy(){
+  const p=PRIVACY[state.lang]||PRIVACY.zh;
+  let html=`<p>${esc(p.intro)}</p>`;
+  p.sections.forEach(s=>{
+    html+=`<h2>${esc(s.h)}</h2><ul>`+s.items.map(i=>`<li>${esc(i)}</li>`).join("")+`</ul>`;
+  });
+  html+=`<p class="privacy-contact">${esc(p.contact)}</p>`;
+  $("#privacy-body").innerHTML=html;
+}
+function openPrivacy(){
+  state.privacyFrom=state.tab;
+  $("#consent").hidden=true;
+  ["home","notes","work","settings"].forEach(v=>$("#view-"+v).hidden=true);
+  $("#main-topbar").hidden=true;
+  $("#main-tabbar").hidden=true;
+  $("#view-privacy").hidden=false;
+  renderPrivacy();
+}
+function closePrivacy(){
+  $("#view-privacy").hidden=true;
+  $("#main-topbar").hidden=false;
+  $("#main-tabbar").hidden=false;
+  switchTab(state.privacyFrom||"settings");
+  if(load(CONSENT_KEY)!=="agreed") $("#consent").hidden=false;
+}
+function openConsent(){
+  $("#consent-summary").textContent=t("privacy.summary");
+  $("#consent").hidden=false;
+}
+function agreeConsent(){
+  save(CONSENT_KEY,"agreed");
+  $("#consent").hidden=true;
+}
 function trashCount(src){ return trashItems().filter(x=>x.src===src).length; }
 function renderTrash(){
   const cards=$("#trash-cards"); cards.innerHTML="";
@@ -1265,6 +1422,11 @@ function bind(){
   $("#tr-empty").addEventListener("click",emptyTrash);
   $("#btn-backup").addEventListener("click",openBackup);
   $("#backup-back").addEventListener("click",closeBackup);
+  $("#btn-privacy").addEventListener("click",openPrivacy);
+  $("#privacy-back").addEventListener("click",closePrivacy);
+  $("#consent-agree").addEventListener("click",agreeConsent);
+  $("#consent-decline").addEventListener("click",()=>toast(t("consent.declineNotice")));
+  $("#consent-open-privacy").addEventListener("click",openPrivacy);
   document.querySelectorAll("#sp-tabs .sp-tab").forEach(b=>b.addEventListener("click",()=>{spChannel=b.dataset.ch;renderSponsor();}));
 
   document.querySelectorAll("#lang-switch .lang-opt").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
@@ -1309,6 +1471,7 @@ function init(){
   applyStaticText();
   renderAll();
   switchTab("notes");
+  if(load(CONSENT_KEY)!=="agreed") openConsent();
 }
 init();
 })();
