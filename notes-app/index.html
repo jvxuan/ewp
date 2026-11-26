@@ -19,7 +19,8 @@ button{font-family:inherit;cursor:pointer}
 @media(min-width:480px){ body{padding:24px 0} .phone{height:92vh;border-radius:28px;border:1px solid var(--border)} }
 
 /* 顶栏 */
-.topbar{display:flex;align-items:center;gap:10px;height:48px;min-height:48px;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--border)}
+.topbar{display:flex;align-items:center;gap:10px;height:48px;min-height:48px;padding:0 16px;background:var(--panel);position:relative}
+.topbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;transform:scaleY(.5);transform-origin:bottom;background:var(--border)}
 .topbar .top-title{font-size:18px;font-weight:700;flex:1}
 .topbar .icon-btn{border:none;background:transparent;width:36px;height:36px;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .topbar .icon-btn:hover{background:transparent}
@@ -65,7 +66,8 @@ button{font-family:inherit;cursor:pointer}
 .note-card.first.done{background:var(--done-soft);border-color:var(--border)}
 
 /* 底部 Tab */
-.tabbar{display:flex;background:var(--panel);border-top:1px solid var(--border)}
+.tabbar{display:flex;background:var(--panel);position:relative}
+.tabbar::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;transform:scaleY(.5);transform-origin:top;background:var(--border)}
 .tabbar .tab{flex:1;border:none;background:none;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#6b6b6b}
 .tabbar .tab .tab-icon{display:flex}
 .tabbar .tab .tab-icon svg{width:21px;height:21px;display:block}
@@ -95,7 +97,8 @@ button{font-family:inherit;cursor:pointer}
 /* ---------- 编辑页（独立视图） ---------- */
 #view-editor{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
 #view-editor[hidden]{display:none}
-.editor-top{display:flex;align-items:center;gap:10px;height:48px;min-height:48px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)}
+.editor-top{display:flex;align-items:center;gap:10px;height:48px;min-height:48px;padding:0 12px;background:var(--panel);position:relative}
+.editor-top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;transform:scaleY(.5);transform-origin:bottom;background:var(--border)}
 .back-btn{border:none;background:transparent;width:36px;height:36px;font-size:28px;color:var(--text);display:flex;align-items:center;justify-content:center;line-height:1;padding-bottom:3px}
 .back-btn:hover{background:transparent}
 .editor-top .btn{margin-left:auto}
@@ -410,7 +413,7 @@ const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const CONSENT_KEY="notes-app-v1-consent";
 const APP_NAME="EWP";
-const APP_VERSION="2.46";
+const APP_VERSION="2.47";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
