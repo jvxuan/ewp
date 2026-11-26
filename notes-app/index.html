@@ -87,7 +87,9 @@ button{font-family:inherit;cursor:pointer}
 .sp-qr{width:180px;height:180px;border-radius:12px;border:1px solid var(--border);object-fit:cover;background:var(--bg)}
 .sp-row{width:100%;display:flex;flex-direction:column;gap:10px}
 .sp-addr{width:100%;display:flex;gap:8px;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
-.sp-addr .sp-addr-text{flex:1;font-size:13px;word-break:break-all;line-height:1.5}
+.sp-addr .sp-addr-text{flex:1;font-size:13px;word-break:break-all;line-height:1.5;color:inherit;text-decoration:none}
+.sp-addr a.sp-addr-text{color:var(--primary)}
+.sp-addr a.sp-addr-text:hover{text-decoration:underline}
 .sp-empty{color:var(--muted);font-size:13px;padding:40px 0;text-align:center}
 
 /* ---------- 编辑页（独立视图） ---------- */
@@ -327,7 +329,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.29";
+const APP_VERSION="2.30";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal 链接 / 加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -961,19 +963,28 @@ $("#cm-close").addEventListener("click",closeCatManager);
 let spChannel="wechat";
 function openSponsor(){ $("#sponsor").hidden=false; spChannel="wechat"; renderSponsor(); }
 function closeSponsor(){ $("#sponsor").hidden=true; }
-function spAddrRow(label,value){
+function spHasIntl(){ return !!(SPONSOR.international.paypal || SPONSOR.international.crypto); }
+function spAddrRow(label,value,isLink){
   const row=document.createElement("div"); row.className="sp-addr";
-  const txt=document.createElement("span"); txt.className="sp-addr-text"; txt.textContent=label+"："+value;
+  let txt;
+  if(isLink && /^https?:\/\//i.test(value)){
+    txt=document.createElement("a"); txt.className="sp-addr-text"; txt.href=value; txt.target="_blank"; txt.rel="noopener noreferrer";
+  }else{
+    txt=document.createElement("span"); txt.className="sp-addr-text";
+  }
+  txt.textContent=label+"："+value;
   const btn=document.createElement("button"); btn.className="btn small"; btn.textContent=t("sponsor.copy");
   btn.addEventListener("click",()=>copyText(value));
   row.appendChild(txt); row.appendChild(btn);
   return row;
 }
 function renderSponsor(){
+  if(spChannel==="international" && !spHasIntl()) spChannel="wechat";
   document.querySelectorAll("#sp-tabs .sp-tab").forEach(b=>{
     b.textContent=t("sponsor."+b.dataset.ch);
     b.classList.toggle("active",b.dataset.ch===spChannel);
   });
+  document.querySelector('#sp-tabs .sp-tab[data-ch="international"]').hidden=!spHasIntl();
   $("#sp-thanks").textContent=t("sponsor.thanks");
   const body=$("#sp-body"); body.innerHTML="";
   if(spChannel==="wechat"||spChannel==="alipay"){
@@ -986,7 +997,7 @@ function renderSponsor(){
     }
   }else{
     const row=document.createElement("div");row.className="sp-row";
-    if(SPONSOR.international.paypal) row.appendChild(spAddrRow(t("sponsor.paypal"),SPONSOR.international.paypal));
+    if(SPONSOR.international.paypal) row.appendChild(spAddrRow(t("sponsor.paypal"),SPONSOR.international.paypal,true));
     if(SPONSOR.international.crypto) row.appendChild(spAddrRow(SPONSOR.international.cryptoLabel||t("sponsor.crypto"),SPONSOR.international.crypto));
     if(!row.children.length){const e=document.createElement("div");e.className="sp-empty";e.textContent=t("sponsor.empty");row.appendChild(e);}
     body.appendChild(row);
