@@ -141,6 +141,10 @@ button{font-family:inherit;cursor:pointer}
 .tr-row .tr-actions{display:flex;gap:6px;flex-shrink:0}
 .tr-row .tr-actions button{border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:6px 9px;font-size:13px}
 .tr-row .tr-actions .forever{color:var(--danger);border-color:var(--danger)}
+.trash-cards{display:flex;gap:8px;margin-bottom:14px}
+.trash-card{flex:1;border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:11px 6px;text-align:center;font-size:13px;color:var(--muted)}
+.trash-card.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.trash-card .tc-count{display:block;font-size:11px;margin-top:2px;opacity:.7}
 
 /* 应用内弹窗 */
 .modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:80}
@@ -243,6 +247,13 @@ button{font-family:inherit;cursor:pointer}
     <div class="setting-row"><span data-i18n="setting.about">关于</span><span id="about-ver" style="color:var(--muted);font-size:13px"></span></div>
   </section>
 
+  <!-- 回收站（页面式） -->
+  <section class="view" id="view-trash">
+    <div class="trash-cards" id="trash-cards"></div>
+    <div class="note-list" id="tr-list"></div>
+    <button class="btn danger" id="tr-empty" data-i18n="trash.emptyBin">清空回收站</button>
+  </section>
+
   <nav class="tabbar" id="main-tabbar">
     <button class="tab active" data-tab="notes"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5l1.4 1.4L11 7.5M8 13.5l1.4 1.4L11 12.5M14.5 8.5H17M14.5 13.5H17"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="4" y="3.5" width="16" height="17" rx="2" fill="#ececee" stroke="#0d0d0d" stroke-width="1.6"/><path d="M8 8.6l1.3 1.3 1.9-2.1" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13.6l1.3 1.3 1.9-2.1" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.6 8.6h2.4M14.6 13.6h2.4" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round"/></svg></span><span data-i18n="tab.notes">执行</span></button>
     <button class="tab" data-tab="work"><span class="tab-icon"><svg class="ic-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5v2M3.5 12h17"/></svg><svg class="ic-filled" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="7.5" width="17" height="12" rx="2" fill="#ececee" stroke="#0d0d0d" stroke-width="1.6"/><path d="M9 7.5V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5v2" stroke="#0d0d0d" stroke-width="1.7" stroke-linecap="round" fill="none"/><path d="M3.5 12h17" stroke="#0d0d0d" stroke-width="1.6"/></svg></span><span data-i18n="tab.work">工作</span></button>
@@ -299,16 +310,6 @@ button{font-family:inherit;cursor:pointer}
     </div>
   </div>
 
-  <!-- 回收站抽屉 -->
-  <div id="trash-manager" hidden>
-    <div class="drawer-mask" id="tr-mask"></div>
-    <div class="drawer">
-      <h3 data-i18n="setting.trash">回收站</h3>
-      <div class="cm-list" id="tr-list"></div>
-      <button class="btn danger" id="tr-empty" data-i18n="trash.emptyBin">清空回收站</button>
-      <button class="btn" id="tr-close" data-i18n="drawer.done">完成</button>
-    </div>
-  </div>
   <!-- 分类选择弹层 -->
   <div id="cat-picker" hidden>
     <div class="drawer-mask" id="cp-mask"></div>
@@ -350,7 +351,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.39";
+const APP_VERSION="2.40";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -460,7 +461,7 @@ const state={
   todos:[], notes:[], workNotes:[], customCats:[], catOrder:[], retired:[],
   currentKind:null, currentId:null, currentItem:null,
   draft:{category:""},
-  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, dirty:false, editorFrom:"notes",
+  tab:"notes", filterCat:ALL_CAT, notesFilter:ALL_CAT, workFilter:ALL_CAT, trashFilter:"note", dirty:false, editorFrom:"notes",
   lang:(load(LANG_KEY)||"zh")
 };
 
@@ -766,10 +767,10 @@ function renderAll(){
 }
 
 /* ---------- 视图路由 ---------- */
-const TITLE_KEY={home:"tab.home",notes:"tab.notes",work:"tab.work",settings:"tab.settings"};
+const TITLE_KEY={home:"tab.home",notes:"tab.notes",work:"tab.work",settings:"tab.settings",trash:"setting.trash"};
 function switchTab(tab){
   state.tab=tab;
-  ["home","notes","work","settings"].forEach(t=>$("#view-"+t).hidden=t!==tab);
+  ["home","notes","work","settings","trash"].forEach(t=>$("#view-"+t).hidden=t!==tab);
   document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
   $("#top-title").textContent=t(TITLE_KEY[tab]);
   $("#top-action").style.display = (tab==="home"||tab==="notes"||tab==="work") ? "flex" : "none";
@@ -934,20 +935,29 @@ function trashItems(){
 function trashTable(src){ return src==="todo"?state.todos:src==="work"?state.workNotes:state.notes; }
 function trashPersist(src){ if(src==="todo")persistTodos(); else if(src==="work")persistWork(); else persistNotes(); }
 function trashTitle(it,src){ return src==="todo"?(it.text||""):(it.title||""); }
-function openTrash(){ $("#trash-manager").hidden=false; renderTrash(); }
-function closeTrash(){ $("#trash-manager").hidden=true; }
+const TRASH_SRC=[{key:"note",label:"tab.notes"},{key:"work",label:"tab.work"},{key:"todo",label:"tab.home"}];
+function openTrash(){ switchTab("trash"); renderTrash(); }
+function trashCount(src){ return trashItems().filter(x=>x.src===src).length; }
 function renderTrash(){
+  const cards=$("#trash-cards"); cards.innerHTML="";
+  TRASH_SRC.forEach(({key,label})=>{
+    const b=document.createElement("button");
+    b.className="trash-card"+(state.trashFilter===key?" active":"");
+    b.innerHTML=`${t(label)}<span class="tc-count">${trashCount(key)}</span>`;
+    b.addEventListener("click",()=>{ state.trashFilter=key; renderTrash(); });
+    cards.appendChild(b);
+  });
   const list=$("#tr-list"); list.innerHTML="";
-  const items=trashItems();
-  $("#tr-empty").style.display=items.length?"":"none";
+  const any=trashItems().length;
+  $("#tr-empty").style.display=any?"":"none";
+  const items=trashItems().filter(x=>x.src===state.trashFilter);
   if(!items.length){ list.innerHTML=`<div class="empty-tip">${t("trash.empty")}</div>`; return; }
   items.forEach(({src,it})=>{
     const row=document.createElement("div");
     row.className="tr-row";
     const title=esc(trashTitle(it,src)||t("card.untitled"));
     const sub=src==="todo"?esc(it.note||""):esc(textFromHtml(it.content)||"");
-    const srcLabel=src==="todo"?t("tab.home"):src==="work"?t("tab.work"):t("tab.notes");
-    row.innerHTML=`<div class="tr-body"><div class="tr-src">${esc(srcLabel)}</div><div class="tr-title">${title}</div>${sub?`<div style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sub}</div>`:""}</div>
+    row.innerHTML=`<div class="tr-body"><div class="tr-title">${title}</div>${sub?`<div style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sub}</div>`:""}</div>
       <div class="tr-actions"><button class="restore">${t("trash.restore")}</button><button class="forever">${t("trash.forever")}</button></div>`;
     row.querySelector(".restore").addEventListener("click",()=>{
       it.deleted=false; trashPersist(src); renderAll(); renderTrash(); toast(t("toast.restored"));
@@ -1189,8 +1199,6 @@ function bind(){
   $("#sp-mask").addEventListener("click",closeSponsor);
   $("#sp-close").addEventListener("click",closeSponsor);
   $("#btn-trash").addEventListener("click",openTrash);
-  $("#tr-mask").addEventListener("click",closeTrash);
-  $("#tr-close").addEventListener("click",closeTrash);
   $("#tr-empty").addEventListener("click",emptyTrash);
   document.querySelectorAll("#sp-tabs .sp-tab").forEach(b=>b.addEventListener("click",()=>{spChannel=b.dataset.ch;renderSponsor();}));
 
