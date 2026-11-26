@@ -71,8 +71,8 @@ button{font-family:inherit;cursor:pointer}
 .tabbar .tab .tab-icon svg{width:21px;height:21px;display:block}
 .tabbar .tab.active{color:#000;font-weight:600}
 .tabbar .tab .tab-icon .ic-filled{display:none}
-.tabbar .tab.active .tab-icon .ic-outline{display:none}
-.tabbar .tab.active .tab-icon .ic-filled{display:block}
+.tabbar .tab.active .tab-icon{background:#ececee;border-radius:10px;padding:5px 9px}
+.tabbar .tab.active .tab-icon svg{stroke:#0d0d0d}
 
 /* 占位页 */
 .placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px 24px;text-align:center;color:var(--muted)}
@@ -350,7 +350,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.37";
+const APP_VERSION="2.38";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
