@@ -329,7 +329,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.31";
+const APP_VERSION="2.32";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -514,29 +514,35 @@ function orderedCats(){
   const rest=merged.filter(c=>!order.includes(c));
   return [...order,...rest];
 }
+function noteCats(){
+  const merged=EXEC_CATS.filter(c=>!state.retired.includes(c));
+  state.customCats.forEach(c=>{if(!merged.includes(c))merged.push(c);});
+  state.notes.forEach(n=>{if(n.category&&!merged.includes(n.category))merged.push(n.category);});
+  const order=(state.catOrder||[]).filter(c=>merged.includes(c));
+  return [...order,...merged.filter(c=>!order.includes(c))];
+}
+function workCats(){
+  const merged=WORK_CATS.filter(c=>!state.retired.includes(c));
+  state.customCats.forEach(c=>{if(!merged.includes(c))merged.push(c);});
+  state.workNotes.forEach(w=>{if(w.category&&!merged.includes(w.category))merged.push(w.category);});
+  const order=(state.catOrder||[]).filter(c=>merged.includes(c));
+  return [...order,...merged.filter(c=>!order.includes(c))];
+}
 function editorCats(){
-  if(state.currentKind==="work") return WORK_CATS;
-  if(state.currentKind==="note") return EXEC_CATS;
+  if(state.currentKind==="work") return workCats();
+  if(state.currentKind==="note") return noteCats();
   return orderedCats();
 }
-// 分类管理弹窗跟随当前页：执行/工作页只展示本表固定分类，避免与主页全局池串台
+// 分类管理弹窗跟随当前页：执行/工作/主页各自展示本表分类，自定义分类全局共享
 function managerCats(){
-  if(state.tab==="notes"){
-    const base=EXEC_CATS.slice();
-    state.notes.forEach(n=>{if(n.category&&!base.includes(n.category))base.push(n.category);});
-    return base;
-  }
-  if(state.tab==="work"){
-    const base=WORK_CATS.slice();
-    state.workNotes.forEach(w=>{if(w.category&&!base.includes(w.category))base.push(w.category);});
-    return base;
-  }
+  if(state.tab==="notes") return noteCats();
+  if(state.tab==="work") return workCats();
   return orderedCats();
 }
 function ensureValidCat(){
-  if(state.filterCat===ALL_CAT) return;
-  const cats=categories();
-  if(!cats.includes(state.filterCat)) state.filterCat=ALL_CAT;
+  if(state.filterCat!==ALL_CAT&&!categories().includes(state.filterCat)) state.filterCat=ALL_CAT;
+  if(state.notesFilter!==ALL_CAT&&!noteCats().includes(state.notesFilter)) state.notesFilter=ALL_CAT;
+  if(state.workFilter!==ALL_CAT&&!workCats().includes(state.workFilter)) state.workFilter=ALL_CAT;
 }
 const CAT_SVG={
   "life":`<path d="M5 19C5 9 13 5 19 5c0 8-4 14-12 14"/><path d="M5 19c3-4 6-7 10-9"/>`,
@@ -710,7 +716,7 @@ function renderNotesList(){
   const sortFn=(a,b)=>Number(a.done)-Number(b.done)||b.updated_at.localeCompare(a.updated_at);
   const box=$("#notes-list"); box.innerHTML="";
   let rows;
-  if(f===ALL_CAT){ rows=groupFirst(state.notes,EXEC_CATS,sortFn); }
+  if(f===ALL_CAT){ rows=groupFirst(state.notes,noteCats(),sortFn); }
   else{ rows=state.notes.filter(n=>n.category===f).sort(sortFn).map(n=>({it:n,cat:n.category})); }
   if(!rows.length){box.innerHTML=`<div class="empty-tip">${f===ALL_CAT?t("empty.notesAll"):t("empty.notesCat")}</div>`;return;}
   const overview=f===ALL_CAT;
@@ -721,7 +727,7 @@ function renderWorkList(){
   const sortFn=(a,b)=>Number(a.done)-Number(b.done)||b.updated_at.localeCompare(a.updated_at);
   const box=$("#work-list"); box.innerHTML="";
   let rows;
-  if(f===ALL_CAT){ rows=groupFirst(state.workNotes,WORK_CATS,sortFn); }
+  if(f===ALL_CAT){ rows=groupFirst(state.workNotes,workCats(),sortFn); }
   else{ rows=state.workNotes.filter(w=>w.category===f).sort(sortFn).map(w=>({it:w,cat:w.category})); }
   if(!rows.length){box.innerHTML=`<div class="empty-tip">${f===ALL_CAT?t("empty.workAll"):t("empty.workCat")}</div>`;return;}
   const overview=f===ALL_CAT;
@@ -729,8 +735,8 @@ function renderWorkList(){
 }
 function renderAll(){
   renderCatBar(); renderHomeList();
-  renderSideBar("#notes-cat-bar",EXEC_CATS,"notesFilter",renderNotesList);
-  renderSideBar("#work-cat-bar",WORK_CATS,"workFilter",renderWorkList);
+  renderSideBar("#notes-cat-bar",noteCats(),"notesFilter",renderNotesList);
+  renderSideBar("#work-cat-bar",workCats(),"workFilter",renderWorkList);
   renderNotesList(); renderWorkList();
 }
 
@@ -786,7 +792,7 @@ function fillTodo(todo){
 function fillNote(n){
   $("#todo-text").value=n.title||"";
   $("#todo-note").value=textFromHtml(n.content)||"";
-  const cats=state.currentKind==="work"?WORK_CATS:EXEC_CATS;
+  const cats=state.currentKind==="work"?workCats():noteCats();
   state.draft.category=n.category||cats[0]||"";
   renderCatSelect();
 }
@@ -858,7 +864,7 @@ function persist(showToastMsg){
     const isWork=state.currentKind==="work";
     const table=isWork?state.workNotes:state.notes;
     const persistTable=isWork?persistWork:persistNotes;
-    const cats=isWork?WORK_CATS:EXEC_CATS;
+    const cats=isWork?workCats():noteCats();
     const cat=state.draft.category||cats[0]||"";
     if(state.currentId===null||!state.currentItem){
       const n={id:uid(),title,content,category:cat,done:false,created_at:ts,updated_at:ts};
@@ -897,51 +903,51 @@ function openCatManager(){ $("#cat-manager").hidden=false; renderCatManager(); }
 function closeCatManager(){ $("#cat-manager").hidden=true; }
 
 function renderCatManager(){
-  const fixed=(state.tab==="notes"||state.tab==="work");
-  const addBox=$(".cm-add"); if(addBox) addBox.style.display=fixed?"none":"";
+  const pool=managerCats();
+  const addBox=$(".cm-add"); if(addBox) addBox.style.display="";
   const list=$("#cm-list"); list.innerHTML="";
-  managerCats().forEach(c=>{
+  pool.forEach(c=>{
     const li=document.createElement("div");
     li.className="cm-item";
     li.dataset.cat=c;
-    const grip=fixed?"":GRIP_SVG;
-    const actions=fixed?"":`<button class="rename" title="${t("action.rename")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m13.5 6.5 3 3"/></svg></button>
+    const actions=`<button class="rename" title="${t("action.rename")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m13.5 6.5 3 3"/></svg></button>
       <button class="del" title="${t("action.delete")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2M6.5 7l1 12h9l1-12"/><path d="M10 11v5M14 11v5"/></svg></button>`;
-    li.innerHTML=`<span class="cm-grip">${grip}</span><span class="cm-name">${esc(catLabel(c))}</span>${actions}`;
-    if(!fixed){
-      li.querySelector(".rename").addEventListener("click",async()=>{
-        const name=await modalPrompt(t("modal.renameCat"),c,t("ph.renameCat"));
-        if(name===null)return;
-        if(name===c)return;
-        if(!name)return toast(t("toast.nameEmpty"));
-        if(categories().includes(name))return toast(t("toast.catExists"));
-        state.notes.forEach(n=>{if(n.category===c)n.category=name;});
-        state.todos.forEach(t=>{if(t.category===c)t.category=name;});
-        state.workNotes.forEach(w=>{if(w.category===c)w.category=name;});
-        if(PRESET_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
-        else state.customCats=state.customCats.filter(x=>x!==c);
-        if(!PRESET_CATS.includes(name)){ if(!state.customCats.includes(name))state.customCats.push(name); }
-        state.retired=state.retired.filter(x=>x!==name);
-        state.catOrder=state.catOrder.map(x=>x===c?name:x);
-        if(state.filterCat===c)state.filterCat=name;
-        persistRetired(); persistCats(); persistOrder(); persistTodos(); persistNotes(); persistWork(); renderAll(); renderCatManager(); toast(t("toast.renamed"));
-      });
-      li.querySelector(".del").addEventListener("click",async()=>{
-        const cats=categories();
-        if(cats.length<=1)return toast(t("toast.oneCat"));
-        const fallback=cats[0]===c?cats[1]:cats[0];
-        const ok=await modalConfirm(t("modal.delCat"),t("modal.delCatMsg",{c:catLabel(c),f:catLabel(fallback)}),{danger:true,okText:t("action.delete")});
-        if(!ok)return;
-        state.notes.forEach(n=>{if(n.category===c)n.category=fallback;});
-        state.todos.forEach(t=>{if(t.category===c)t.category=fallback;});
-        state.workNotes.forEach(w=>{if(w.category===c)w.category=fallback;});
-        if(PRESET_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
-        else state.customCats=state.customCats.filter(x=>x!==c);
-        state.catOrder=state.catOrder.filter(x=>x!==c);
-        if(state.filterCat===c)state.filterCat=fallback;
-        persistRetired(); persistOrder(); persistCats(); persistTodos(); persistNotes(); persistWork(); renderAll(); renderCatManager(); toast(t("toast.catDeleted"));
-      });
-    }
+    li.innerHTML=`<span class="cm-grip">${GRIP_SVG}</span><span class="cm-name">${esc(catLabel(c))}</span>${actions}`;
+    li.querySelector(".rename").addEventListener("click",async()=>{
+      const name=await modalPrompt(t("modal.renameCat"),c,t("ph.renameCat"));
+      if(name===null)return;
+      if(name===c)return;
+      if(!name)return toast(t("toast.nameEmpty"));
+      if(pool.includes(name))return toast(t("toast.catExists"));
+      state.notes.forEach(n=>{if(n.category===c)n.category=name;});
+      state.todos.forEach(t=>{if(t.category===c)t.category=name;});
+      state.workNotes.forEach(w=>{if(w.category===c)w.category=name;});
+      if(PRESET_CATS.includes(c)||EXEC_CATS.includes(c)||WORK_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
+      else state.customCats=state.customCats.filter(x=>x!==c);
+      if(!PRESET_CATS.includes(name)&&!EXEC_CATS.includes(name)&&!WORK_CATS.includes(name)){ if(!state.customCats.includes(name))state.customCats.push(name); }
+      state.retired=state.retired.filter(x=>x!==name);
+      state.catOrder=state.catOrder.map(x=>x===c?name:x);
+      if(state.filterCat===c)state.filterCat=name;
+      if(state.notesFilter===c)state.notesFilter=name;
+      if(state.workFilter===c)state.workFilter=name;
+      persistRetired(); persistCats(); persistOrder(); persistTodos(); persistNotes(); persistWork(); renderAll(); renderCatManager(); toast(t("toast.renamed"));
+    });
+    li.querySelector(".del").addEventListener("click",async()=>{
+      if(pool.length<=1)return toast(t("toast.oneCat"));
+      const fallback=pool[0]===c?pool[1]:pool[0];
+      const ok=await modalConfirm(t("modal.delCat"),t("modal.delCatMsg",{c:catLabel(c),f:catLabel(fallback)}),{danger:true,okText:t("action.delete")});
+      if(!ok)return;
+      state.notes.forEach(n=>{if(n.category===c)n.category=fallback;});
+      state.todos.forEach(t=>{if(t.category===c)t.category=fallback;});
+      state.workNotes.forEach(w=>{if(w.category===c)w.category=fallback;});
+      if(PRESET_CATS.includes(c)||EXEC_CATS.includes(c)||WORK_CATS.includes(c)){ if(!state.retired.includes(c))state.retired.push(c); }
+      else state.customCats=state.customCats.filter(x=>x!==c);
+      state.catOrder=state.catOrder.filter(x=>x!==c);
+      if(state.filterCat===c)state.filterCat=fallback;
+      if(state.notesFilter===c)state.notesFilter=fallback;
+      if(state.workFilter===c)state.workFilter=fallback;
+      persistRetired(); persistOrder(); persistCats(); persistTodos(); persistNotes(); persistWork(); renderAll(); renderCatManager(); toast(t("toast.catDeleted"));
+    });
     list.appendChild(li);
   });
 }
@@ -949,10 +955,12 @@ function renderCatManager(){
 $("#cm-add-btn").addEventListener("click",()=>{
   const input=$("#cm-input"); const name=input.value.trim();
   if(!name)return toast(t("toast.nameEmpty"));
-  if(categories().includes(name))return toast(t("toast.catExists"));
+  if(managerCats().includes(name))return toast(t("toast.catExists"));
   if(!state.customCats.includes(name))state.customCats.push(name);
   if(!state.catOrder.includes(name))state.catOrder.push(name);
-  state.filterCat=name;
+  if(state.tab==="notes")state.notesFilter=name;
+  else if(state.tab==="work")state.workFilter=name;
+  else state.filterCat=name;
   persistOrder(); persistCats(); persistTodos(); persistNotes(); persistWork(); input.value=""; renderAll(); renderCatManager(); toast(t("toast.catAdded"));
 });
 $("#cm-input").addEventListener("keydown",e=>{if(e.key==="Enter")$("#cm-add-btn").click();});
@@ -1029,9 +1037,11 @@ function importBackup(file){
     if(!ok)return;
     const ts=new Date().toISOString().slice(0,19);
     state.todos=data.todos.map(x=>({id:x.id||uid(),text:x.text||"",note:x.note||"",category:migrateCat(x.category)||PRESET_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts}));
-    state.notes=data.notes.map(x=>{const c=migrateCat(x.category);return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:EXEC_CATS.includes(c)?c:EXEC_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
-    state.workNotes=data.workNotes.map(x=>{const c=migrateCat(x.category);return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:WORK_CATS.includes(c)?c:WORK_CATS[0],done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
-    persistTodos();persistNotes();persistWork();
+    const importedCustom=new Set();
+    state.notes=data.notes.map(x=>{const c=migrateCat(x.category)||EXEC_CATS[0]; if(!EXEC_CATS.includes(c))importedCustom.add(c); return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:c,done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
+    state.workNotes=data.workNotes.map(x=>{const c=migrateCat(x.category)||WORK_CATS[0]; if(!WORK_CATS.includes(c))importedCustom.add(c); return{id:x.id||uid(),title:x.title||"",content:x.content||"",category:c,done:!!x.done,created_at:x.created_at||ts,updated_at:x.updated_at||ts};});
+    importedCustom.forEach(c=>{if(c&&!state.customCats.includes(c))state.customCats.push(c);});
+    persistTodos();persistNotes();persistWork();persistCats();persistOrder();
     renderAll(); toast(t("toast.imported"));
   };
   reader.readAsText(file);
@@ -1133,14 +1143,14 @@ function init(){
   }
   if(!state.workNotes.length){ state.workNotes=seedWork(); persistWork(); }
   state.todos.forEach(t=>{if(!t.id)t.id=uid(); t.category=migrateCat(t.category);});
-  state.notes.forEach(n=>{if(!n.id)n.id=uid(); if(n.done===undefined)n.done=false; n.category=migrateCat(n.category); if(!EXEC_CATS.includes(n.category))n.category=EXEC_CATS[0];});
-  state.workNotes.forEach(w=>{if(!w.id)w.id=uid(); if(w.done===undefined)w.done=false; w.category=migrateCat(w.category); if(!WORK_CATS.includes(w.category))w.category=WORK_CATS[0];});
   state.customCats=(loadCats()||[]).map(migrateCat);
   state.catOrder=(loadOrder()||[]).map(migrateCat);
   state.retired=(loadRetired()||[]).map(migrateCat);
+  state.notes.forEach(n=>{if(!n.id)n.id=uid(); if(n.done===undefined)n.done=false; const c=migrateCat(n.category); n.category=(EXEC_CATS.includes(c)||state.customCats.includes(c))?c:EXEC_CATS[0];});
+  state.workNotes.forEach(w=>{if(!w.id)w.id=uid(); if(w.done===undefined)w.done=false; const c=migrateCat(w.category); w.category=(WORK_CATS.includes(c)||state.customCats.includes(c))?c:WORK_CATS[0];});
   setupSortable($("#cm-list"),{
     gripSel:".cm-grip",itemSel:".cm-item",dataAttr:"cat",
-    onReorder:order=>{state.catOrder=order;persistOrder();renderCatBar();renderHomeList();renderCatManager();}
+    onReorder:order=>{state.catOrder=order;persistOrder();renderAll();renderCatManager();}
   });
   ensureValidCat();
   $("#about-ver").textContent=`${APP_NAME} v${APP_VERSION}`;
