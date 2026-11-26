@@ -24,7 +24,7 @@ button{font-family:inherit;cursor:pointer}
 .topbar .icon-btn{border:none;background:transparent;width:36px;height:36px;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .topbar .icon-btn:hover{background:transparent}
 .topbar .icon-btn svg{width:19px;height:19px;display:block}
-#top-add{font-size:24px;font-weight:600;line-height:1}
+#top-add{font-size:23px;font-weight:500;line-height:1}
 .top-actions{display:flex;align-items:center;gap:8px}
 
 .view{flex:1;overflow-y:auto;padding:12px 12px 18px}
@@ -47,7 +47,7 @@ button{font-family:inherit;cursor:pointer}
 .pane-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
 .note-list{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
 
-.note-card{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;cursor:pointer}
+.note-card{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;cursor:pointer}
 .note-card:hover{border-color:#3d3d3d !important}
 .note-card.done{background:var(--done-soft)}
 .note-card .nc-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
@@ -104,8 +104,10 @@ button{font-family:inherit;cursor:pointer}
 .trash-top-title{font-size:18px;font-weight:700}
 .trash-body{flex:1;overflow-y:auto;padding:12px 12px 18px;display:flex;flex-direction:column;gap:14px}
 .backup-body{flex:1;overflow-y:auto;padding:12px 12px 18px;display:flex;flex-direction:column}
+.backup-body .setting-row{margin-bottom:8px}
 .backup-body .setting-row:last-child{margin-bottom:0}
 .backup-hint{font-size:12px;color:var(--muted);line-height:1.6;margin-top:4px}
+.file-input{position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
 .privacy-body{flex:1;overflow-y:auto;padding:14px 16px 24px;display:flex;flex-direction:column;gap:12px}
 .privacy-body h2{font-size:15px;margin:4px 0 2px}
 .privacy-body p{font-size:13.5px;line-height:1.7}
@@ -149,17 +151,9 @@ button{font-family:inherit;cursor:pointer}
 .cm-item button.del:hover{color:var(--danger)}
 
 /* ---------- 回收站 ---------- */
-.tr-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:11px 12px}
-.tr-row .tr-body{flex:1;min-width:0}
-.tr-row .tr-src{font-size:11px;color:var(--muted);margin-bottom:2px}
-.tr-row .tr-title{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tr-row .tr-actions{display:flex;gap:6px;flex-shrink:0}
-.tr-row .tr-actions button{border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:6px 9px;font-size:13px}
-.tr-row .tr-actions .forever{color:var(--danger);border-color:var(--danger)}
-.trash-cards{display:flex;gap:8px;margin-bottom:14px}
-.trash-card{flex:1;border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:11px 6px;text-align:center;font-size:13px;color:var(--muted)}
-.trash-card.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
-.trash-card .tc-count{display:block;font-size:11px;margin-top:2px;opacity:.7}
+.tr-actions{display:flex;gap:6px;flex-shrink:0}
+.tr-actions button{border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:6px 9px;font-size:13px}
+.tr-actions .forever{color:var(--danger);border-color:var(--danger)}
 
 /* 应用内弹窗 */
 .modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:80}
@@ -187,12 +181,12 @@ button{font-family:inherit;cursor:pointer}
 .empty-tip{color:var(--muted);font-size:13px;text-align:center;padding:40px 0}
 
 /* 主页待办条目 */
-.todo-row{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 12px;cursor:pointer}
+.todo-row{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 12px;cursor:pointer}
 .todo-row:hover{border-color:#3d3d3d !important}
 .todo-row.done{background:var(--done-soft)}
 .todo-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--text)}
 .tr-index{width:18px;flex-shrink:0;font-size:15px;font-weight:600;color:var(--muted);text-align:center}
-.tr-cat{flex-shrink:0;width:64px;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden}
+.tr-cat{flex-shrink:0;width:56px;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden}
 .todo-row .tr-body{flex:1;min-width:0}
 .todo-row .tr-text{font-size:15px;word-break:break-word}
 .tr-note{font-size:12.5px;color:var(--muted);word-break:break-word;margin-top:3px}
@@ -268,8 +262,13 @@ button{font-family:inherit;cursor:pointer}
       <span class="trash-top-title" data-i18n="setting.trash">回收站</span>
     </div>
     <div class="trash-body">
-      <div class="trash-cards" id="trash-cards"></div>
-      <div class="note-list" id="tr-list"></div>
+      <div class="notes-layout">
+        <div class="cat-bar" id="trash-cards"></div>
+        <div class="note-pane">
+          <div class="pane-head" id="trash-count"></div>
+          <div class="note-list" id="tr-list"></div>
+        </div>
+      </div>
       <button class="btn danger" id="tr-empty" data-i18n="trash.emptyBin">清空回收站</button>
     </div>
   </section>
@@ -284,8 +283,9 @@ button{font-family:inherit;cursor:pointer}
       <div class="setting-row"><span data-i18n="setting.exportAll">导出全部数据（JSON）</span><button class="btn small" id="btn-export-all" data-i18n="setting.export">导出</button></div>
       <div class="setting-row"><span data-i18n="setting.importAll">导入备份（JSON）</span><button class="btn small" id="btn-import-all" data-i18n="setting.import">导入</button></div>
       <div class="setting-row"><span data-i18n="setting.mailBackup">发送到邮箱备份</span><button class="btn small" id="btn-mail-backup" data-i18n="setting.mail">发送</button></div>
+      <div class="setting-row"><span data-i18n="setting.cloudSync">同步到云端</span><button class="btn small" id="btn-cloud-sync" data-i18n="common.comingSoon">开发中</button></div>
       <p class="backup-hint" data-i18n="setting.mailHint">浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。</p>
-      <input type="file" id="import-file" accept="application/json,.json" hidden />
+      <input type="file" id="import-file" accept="application/json,.json" class="file-input" />
     </div>
   </section>
 
@@ -410,7 +410,7 @@ const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const CONSENT_KEY="notes-app-v1-consent";
 const APP_NAME="EWP";
-const APP_VERSION="2.45";
+const APP_VERSION="2.46";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -441,10 +441,10 @@ const I18N={
     "tab.notes":"执行","tab.work":"工作","tab.home":"支付","tab.settings":"设置",
     "action.manage":"管理分类","action.new":"新建","action.back":"返回","action.save":"保存","action.delete":"删除","action.rename":"修改",
     "ph.todo":"待办内容…","ph.record":"记录内容…","ph.note":"补充说明（可选）","ph.untitled":"无标题","ph.start":"开始记录…","ph.newCat":"输入新分类名称","ph.renameCat":"输入分类名称",
-    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.mailBackup":"发送到邮箱备份","setting.mail":"发送","setting.mailHint":"浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。","mail.subject":"EWP 数据备份","mail.body":"你好，\n这是 EWP 记事 App 的数据备份。请将随邮件下载的 notes-backup.json 作为附件附上后再发送。","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于","setting.privacy":"隐私政策",
+    "setting.language":"语言","setting.backup":"数据备份","setting.exportAll":"导出全部数据（JSON）","setting.export":"导出","setting.importAll":"导入备份（JSON）","setting.import":"导入","setting.mailBackup":"发送到邮箱备份","setting.mail":"发送","setting.mailHint":"浏览器无法直接附加附件：点击发送后会先下载备份文件，并打开邮件客户端，请手动将该 JSON 作为附件附上。","mail.subject":"EWP 数据备份","mail.body":"你好，\n这是 EWP 记事 App 的数据备份。请将随邮件下载的 notes-backup.json 作为附件附上后再发送。","setting.clearAll":"清空本地全部数据","setting.clear":"清空","setting.about":"关于","setting.privacy":"隐私政策","setting.cloudSync":"同步到云端","common.comingSoon":"开发中",
     "privacy.title":"隐私政策","privacy.summary":"EWP 是一款本地待办与记录工具，不要求注册账号，你的记录默认只保存在本机，不上传云端。请阅读并同意隐私政策后继续使用。",
     "consent.agree":"同意并继续","consent.decline":"拒绝","consent.declineNotice":"同意隐私政策后才能使用本应用","consent.readMore":"查看完整隐私政策",
-    "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanks":"感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
+    "setting.sponsor":"赞助支持","sponsor.support":"支持","sponsor.thanksMain":"感谢你使用 EWP，若觉得有帮助，","sponsor.thanksCta":"欢迎请作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付宝","sponsor.international":"国际","sponsor.copy":"复制","sponsor.copied":"已复制","sponsor.empty":"该渠道收款方式待补充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密钱包",
     "cat.all":"总览","cat.uncat":"未分类",
     "empty.homeAll":"还没有待办记录，点右上角 ＋ 新建","empty.homeCat":"该分类暂无待办记录",
     "empty.notesAll":"还没有执行记录，点右上角 ＋ 新建","empty.notesCat":"该分类暂无执行记录",
@@ -461,16 +461,16 @@ const I18N={
     "modal.discard":"放弃修改","modal.discardMsg":"有未保存的修改，确定离开？",
     "modal.clearData":"清空数据","modal.clearMsg":"确定清空本地全部记录？此操作不可恢复。",
     "drawer.catManage":"分类管理","drawer.add":"添加","drawer.done":"完成","drawer.chooseCat":"选择分类",
-    "setting.trash":"回收站","trash.manage":"查看","trash.restore":"恢复","trash.forever":"彻底删除","trash.empty":"回收站为空","trash.emptyBin":"清空回收站","trash.emptyMsg":"将永久删除回收站中的全部记录？此操作不可恢复。","trash.foreverMsg":"将永久删除这条记录？此操作不可恢复。","toast.restored":"已恢复"
+    "setting.trash":"回收站","trash.manage":"查看","trash.restore":"恢复","trash.forever":"彻底删除","trash.empty":"回收站为空","trash.emptyBin":"清空回收站","trash.emptyMsg":"将永久删除回收站中的全部记录？此操作不可恢复。","trash.foreverMsg":"将永久删除这条记录？此操作不可恢复。","trash.count":"共 {n} 条","toast.restored":"已恢复"
   },
   en:{
     "tab.notes":"Execute","tab.work":"Work","tab.home":"Pay","tab.settings":"Settings",
     "action.manage":"Manage categories","action.new":"New","action.back":"Back","action.save":"Save","action.delete":"Delete","action.rename":"Rename",
     "ph.todo":"Todo…","ph.record":"Note…","ph.note":"Note (optional)","ph.untitled":"Untitled","ph.start":"Start writing…","ph.newCat":"New category name","ph.renameCat":"Enter category name",
-    "setting.language":"Language","setting.backup":"Data Backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.mailBackup":"Email backup","setting.mail":"Send","setting.mailHint":"The browser cannot attach files directly: after tapping Send, the backup file downloads first and your mail app opens; attach that JSON manually.","mail.subject":"EWP data backup","mail.body":"Hi,\nThis is the data backup from the EWP app. Please attach the downloaded notes-backup.json before sending.","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About","setting.privacy":"Privacy Policy",
+    "setting.language":"Language","setting.backup":"Data Backup","setting.exportAll":"Export all data (JSON)","setting.export":"Export","setting.importAll":"Import backup (JSON)","setting.import":"Import","setting.mailBackup":"Email backup","setting.mail":"Send","setting.mailHint":"The browser cannot attach files directly: after tapping Send, the backup file downloads first and your mail app opens; attach that JSON manually.","mail.subject":"EWP data backup","mail.body":"Hi,\nThis is the data backup from the EWP app. Please attach the downloaded notes-backup.json before sending.","setting.clearAll":"Clear all local data","setting.clear":"Clear","setting.about":"About","setting.privacy":"Privacy Policy","setting.cloudSync":"Cloud sync","common.comingSoon":"Coming soon",
     "privacy.title":"Privacy Policy","privacy.summary":"EWP is a local todo and notes tool that does not require an account. Your records are kept only on this device by default and are not uploaded to the cloud. Please review and agree to the privacy policy to continue.",
     "consent.agree":"Agree and continue","consent.decline":"Decline","consent.declineNotice":"You must agree to the privacy policy to use this app","consent.readMore":"Read full privacy policy",
-    "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanks":"Thanks for using EWP. If it helps, buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
+    "setting.sponsor":"Sponsor","sponsor.support":"Support","sponsor.thanksMain":"Thanks for using EWP. If it helps, ","sponsor.thanksCta":"buy me a coffee ☕","sponsor.wechat":"WeChat","sponsor.alipay":"Alipay","sponsor.international":"International","sponsor.copy":"Copy","sponsor.copied":"Copied","sponsor.empty":"Payment method coming soon","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"Crypto",
     "cat.all":"Overview","cat.uncat":"Uncategorized",
     "empty.homeAll":"No todos yet. Tap ＋ top right to add","empty.homeCat":"No todo records in this category",
     "empty.notesAll":"No tasks yet. Tap ＋ top right to add","empty.notesCat":"No tasks in this category",
@@ -487,16 +487,16 @@ const I18N={
     "modal.discard":"Discard changes","modal.discardMsg":"You have unsaved changes. Leave anyway?",
     "modal.clearData":"Clear data","modal.clearMsg":"Delete all local records? This cannot be undone.",
     "drawer.catManage":"Categories","drawer.add":"Add","drawer.done":"Done","drawer.chooseCat":"Choose category",
-    "setting.trash":"Trash","trash.manage":"View","trash.restore":"Restore","trash.forever":"Delete forever","trash.empty":"Trash is empty","trash.emptyBin":"Empty trash","trash.emptyMsg":"Permanently delete all records in trash? This cannot be undone.","trash.foreverMsg":"Permanently delete this record? This cannot be undone.","toast.restored":"Restored"
+    "setting.trash":"Trash","trash.manage":"View","trash.restore":"Restore","trash.forever":"Delete forever","trash.empty":"Trash is empty","trash.emptyBin":"Empty trash","trash.emptyMsg":"Permanently delete all records in trash? This cannot be undone.","trash.foreverMsg":"Permanently delete this record? This cannot be undone.","trash.count":"{n} items","toast.restored":"Restored"
   },
   zhTW:{
     "tab.notes":"執行","tab.work":"工作","tab.home":"支付","tab.settings":"設定",
     "action.manage":"管理分類","action.new":"新增","action.back":"返回","action.save":"儲存","action.delete":"刪除","action.rename":"修改",
     "ph.todo":"待辦內容…","ph.record":"記錄內容…","ph.note":"補充說明（可選）","ph.untitled":"無標題","ph.start":"開始記錄…","ph.newCat":"輸入新分類名稱","ph.renameCat":"輸入分類名稱",
-    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.mailBackup":"寄送到郵箱備份","setting.mail":"寄送","setting.mailHint":"瀏覽器無法直接附加附件：點擊寄送後會先下載備份檔，並開啟郵件用戶端，請手動將該 JSON 作為附件附上。","mail.subject":"EWP 資料備份","mail.body":"你好，\n這是 EWP 記事 App 的資料備份。請將隨郵件下載的 notes-backup.json 作為附件附上後再寄送。","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於","setting.privacy":"隱私政策",
+    "setting.language":"語言","setting.backup":"資料備份","setting.exportAll":"匯出全部資料（JSON）","setting.export":"匯出","setting.importAll":"匯入備份（JSON）","setting.import":"匯入","setting.mailBackup":"寄送到郵箱備份","setting.mail":"寄送","setting.mailHint":"瀏覽器無法直接附加附件：點擊寄送後會先下載備份檔，並開啟郵件用戶端，請手動將該 JSON 作為附件附上。","mail.subject":"EWP 資料備份","mail.body":"你好，\n這是 EWP 記事 App 的資料備份。請將隨郵件下載的 notes-backup.json 作為附件附上後再寄送。","setting.clearAll":"清空本地全部資料","setting.clear":"清空","setting.about":"關於","setting.privacy":"隱私政策","setting.cloudSync":"同步到雲端","common.comingSoon":"開發中",
     "privacy.title":"隱私政策","privacy.summary":"EWP 是一款本地待辦與記錄工具，不需註冊帳號，你的記錄預設只儲存在本機，不會上傳雲端。請閱讀並同意隱私政策後繼續使用。",
     "consent.agree":"同意並繼續","consent.decline":"拒絕","consent.declineNotice":"同意隱私政策後才能使用本應用程式","consent.readMore":"檢視完整隱私政策",
-    "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanks":"感謝你使用 EWP，若覺得有幫助，歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
+    "setting.sponsor":"贊助支持","sponsor.support":"支持","sponsor.thanksMain":"感謝你使用 EWP，若覺得有幫助，","sponsor.thanksCta":"歡迎請作者喝杯咖啡 ☕","sponsor.wechat":"微信","sponsor.alipay":"支付寶","sponsor.international":"國際","sponsor.copy":"複製","sponsor.copied":"已複製","sponsor.empty":"此渠道收款方式待補充","sponsor.paypal":"PayPal","sponsor.kofi":"Ko-fi","sponsor.crypto":"加密錢包",
     "cat.all":"總覽","cat.uncat":"未分類",
     "empty.homeAll":"還沒有待辦記錄，點右上角 ＋ 新增","empty.homeCat":"該分類尚無待辦記錄",
     "empty.notesAll":"還沒有執行記錄，點右上角 ＋ 新增","empty.notesCat":"該分類尚無執行記錄",
@@ -513,7 +513,7 @@ const I18N={
     "modal.discard":"放棄修改","modal.discardMsg":"有未儲存的修改，確定離開？",
     "modal.clearData":"清空資料","modal.clearMsg":"確定清空本地全部記錄？此操作無法復原。",
     "drawer.catManage":"分類管理","drawer.add":"新增","drawer.done":"完成","drawer.chooseCat":"選擇分類",
-    "setting.trash":"回收筒","trash.manage":"檢視","trash.restore":"還原","trash.forever":"永久刪除","trash.empty":"回收筒為空","trash.emptyBin":"清空回收筒","trash.emptyMsg":"將永久刪除回收筒中的全部記錄？此操作無法復原。","trash.foreverMsg":"將永久刪除這條記錄？此操作無法復原。","toast.restored":"已還原"
+    "setting.trash":"回收筒","trash.manage":"檢視","trash.restore":"還原","trash.forever":"永久刪除","trash.empty":"回收筒為空","trash.emptyBin":"清空回收筒","trash.emptyMsg":"將永久刪除回收筒中的全部記錄？此操作無法復原。","trash.foreverMsg":"將永久刪除這條記錄？此操作無法復原。","trash.count":"共 {n} 條","toast.restored":"已還原"
   }
 };
 const PRIVACY={
@@ -1146,39 +1146,40 @@ function agreeConsent(){
   save(CONSENT_KEY,"agreed");
   $("#consent").hidden=true;
 }
-function trashCount(src){ return trashItems().filter(x=>x.src===src).length; }
 function renderTrash(){
   const cards=$("#trash-cards"); cards.innerHTML="";
   TRASH_SRC.forEach(({key,label})=>{
     const b=document.createElement("button");
-    b.className="trash-card"+(state.trashFilter===key?" active":"");
-    b.innerHTML=`${t(label)}<span class="tc-count">${trashCount(key)}</span>`;
+    b.className="cat-item no-icon"+(state.trashFilter===key?" active":"");
+    b.innerHTML=`<span class="cat-name">${t(label)}</span>`;
     b.addEventListener("click",()=>{ state.trashFilter=key; renderTrash(); });
     cards.appendChild(b);
   });
   const list=$("#tr-list"); list.innerHTML="";
-  const any=trashItems().length;
+  const all=trashItems();
+  const any=all.length;
   $("#tr-empty").style.display=any?"":"none";
-  const items=trashItems().filter(x=>x.src===state.trashFilter);
+  $("#trash-count").textContent=any?t("trash.count",{n:any}):"";
+  const items=all.filter(x=>x.src===state.trashFilter);
   if(!items.length){ list.innerHTML=`<div class="empty-tip">${t("trash.empty")}</div>`; return; }
   items.forEach(({src,it})=>{
-    const row=document.createElement("div");
-    row.className="tr-row";
+    const card=document.createElement("div");
+    card.className="note-card";
     const title=esc(trashTitle(it,src)||t("card.untitled"));
     const sub=src==="todo"?esc(it.note||""):esc(textFromHtml(it.content)||"");
-    row.innerHTML=`<div class="tr-body"><div class="tr-title">${title}</div>${sub?`<div style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sub}</div>`:""}</div>
+    card.innerHTML=`<div class="nc-body"><div class="nc-title ${title?"":"empty"}">${title}</div>${sub?`<div class="nc-summary">${sub}</div>`:""}</div>
       <div class="tr-actions"><button class="restore">${t("trash.restore")}</button><button class="forever">${t("trash.forever")}</button></div>`;
-    row.querySelector(".restore").addEventListener("click",()=>{
+    card.querySelector(".restore").addEventListener("click",()=>{
       it.deleted=false; trashPersist(src); renderAll(); renderTrash(); toast(t("toast.restored"));
     });
-    row.querySelector(".forever").addEventListener("click",async()=>{
+    card.querySelector(".forever").addEventListener("click",async()=>{
       const ok=await modalConfirm(t("trash.forever"),t("trash.foreverMsg"),{danger:true,okText:t("trash.forever")});
       if(!ok)return;
       const tbl=trashTable(src);
       const idx=tbl.indexOf(it); if(idx>=0)tbl.splice(idx,1);
       trashPersist(src); renderAll(); renderTrash(); toast(t("toast.deleted"));
     });
-    list.appendChild(row);
+    list.appendChild(card);
   });
 }
 async function emptyTrash(){
@@ -1287,7 +1288,10 @@ function renderSponsor(){
     b.classList.toggle("active",b.dataset.ch===spChannel);
   });
   document.querySelector('#sp-tabs .sp-tab[data-ch="international"]').hidden=!spHasIntl();
-  $("#sp-thanks").textContent=t("sponsor.thanks");
+  const th=$("#sp-thanks"); th.textContent="";
+  const thMain=document.createElement("div"); thMain.textContent=t("sponsor.thanksMain");
+  const thCta=document.createElement("div"); thCta.textContent=t("sponsor.thanksCta");
+  th.appendChild(thMain); th.appendChild(thCta);
   const body=$("#sp-body"); body.innerHTML="";
   if(spChannel==="wechat"||spChannel==="alipay"){
     const cfg=SPONSOR[spChannel];
@@ -1403,6 +1407,7 @@ function bind(){
   $("#btn-export-all").addEventListener("click",downloadJson);
   $("#btn-import-all").addEventListener("click",()=>$("#import-file").click());
   $("#btn-mail-backup").addEventListener("click",mailBackup);
+  $("#btn-cloud-sync").addEventListener("click",()=>toast(t("common.comingSoon")));
   $("#import-file").addEventListener("change",e=>{importBackup(e.target.files[0]);e.target.value="";});
 
   $("#note-title").addEventListener("input",()=>{state.dirty=true;});
