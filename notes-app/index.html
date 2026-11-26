@@ -329,7 +329,7 @@ const CATS_KEY="notes-app-v1-cats";
 const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const APP_NAME="EWP";
-const APP_VERSION="2.32";
+const APP_VERSION="2.33";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
@@ -914,11 +914,12 @@ function renderCatManager(){
       <button class="del" title="${t("action.delete")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2M6.5 7l1 12h9l1-12"/><path d="M10 11v5M14 11v5"/></svg></button>`;
     li.innerHTML=`<span class="cm-grip">${GRIP_SVG}</span><span class="cm-name">${esc(catLabel(c))}</span>${actions}`;
     li.querySelector(".rename").addEventListener("click",async()=>{
-      const name=await modalPrompt(t("modal.renameCat"),c,t("ph.renameCat"));
+      const label=catLabel(c);
+      const name=await modalPrompt(t("modal.renameCat"),label,t("ph.renameCat"));
       if(name===null)return;
-      if(name===c)return;
+      if(name===c||name===label)return;
       if(!name)return toast(t("toast.nameEmpty"));
-      if(pool.includes(name))return toast(t("toast.catExists"));
+      if(pool.some(x=>x===name||catLabel(x)===name))return toast(t("toast.catExists"));
       state.notes.forEach(n=>{if(n.category===c)n.category=name;});
       state.todos.forEach(t=>{if(t.category===c)t.category=name;});
       state.workNotes.forEach(w=>{if(w.category===c)w.category=name;});
