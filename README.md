@@ -1,6 +1,6 @@
-# EWP — 极简记事 / 待办 Web App
+# PEW — 极简记事 / 待办 App
 
-EWP 取自底部导航英文首字母：**E**xecute（执行）/ **W**ork（工作）/ **P**ay（支付）。
+PEW 取自底部导航英文首字母：**P**ay（支付）/ **E**xecute（执行）/ **W**ork（工作）。
 一个移动端优先的纯前端单文件记事应用，原生 HTML / CSS / JavaScript，无框架、无构建步骤、无常驻后端。
 
 ## 特性
@@ -24,16 +24,16 @@ python3 -m http.server 8011
 
 ## 下载 Android APK
 
-调试签名包（minSdk 21 / targetSdk 34，应用名 EWP v2.21）：
+调试签名包（minSdk 21 / targetSdk 34，应用名 PEW v2.60）：
 
-- [Release 页面](https://github.com/jvxuan/ewp/releases/tag/v2.21)
-- [直接下载 EWP-debug-v2.21.apk](https://github.com/jvxuan/ewp/releases/download/v2.21/EWP-debug-v2.21.apk)
+- [Release 页面](https://github.com/jvxuan/ewp/releases/tag/v2.60)
+- [直接下载 PEW-debug-v2.60.apk](https://github.com/jvxuan/ewp/releases/download/v2.60/PEW-debug-v2.60.apk)
 
-> 套壳 WebView 加载线上公网页面，壳内内容随线上版本更新；调试签名安装时可能需允许「未知来源」。
+> 离线壳 WebView 直接加载打进 APK 的 `assets/index.html`，无平台浮窗、断网可用；调试签名安装时可能需允许「未知来源」。
 
 ## 赞助支持
 
-感谢你使用 EWP，若觉得有帮助，欢迎请作者喝杯咖啡 ☕。
+感谢你使用 PEW，若觉得有帮助，欢迎请作者喝杯咖啡 ☕。
 
 | 微信 | 支付宝 |
 | --- | --- |
@@ -50,14 +50,14 @@ python3 -m http.server 8011
 │   ├── data/                 # 原型 SQLite 数据库（运行时生成，已 gitignore）
 │   └── README.md             # 早期原型说明
 ├── docs/sponsor/             # README 赞助展示用收款码图片
-└── apk-shell/                # Android WebView 套壳工程（MainActivity 加载公网链接）
+└── apk-shell/                # Android 离线壳工程（MainActivity 加载 assets/index.html）
 ```
 
 ## 技术说明
 
 - 纯前端 `modern_html` 产物，数据仅保存在当前浏览器本地；更换设备或清理缓存不会自动迁移，需通过设置页导出备份再导入。
 - 早期 `server.py` 全栈原型仅作历史参考，与线上单文件版的数据结构、界面逻辑不一致。
-- `apk-shell/` 为离线套壳工程，壳内页面内容随线上公网链接更新；构建产物、签名密钥与 `.apk` 包均已排除出版本库。
+- `apk-shell/` 为离线壳工程，构建时把 `notes-app/index.html` 复制进 `assets/` 一并打进 APK；构建产物、签名密钥与 `.apk` 包均已排除出版本库。
 
 ## 版本
 
