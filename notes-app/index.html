@@ -62,9 +62,10 @@ button{font-family:inherit;cursor:pointer}
 .note-card .nc-summary{font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .note-card .nc-cat{font-size:11px;color:#b8b8b8;font-weight:400;margin-top:5px}
 .note-card .nc-cat-label{flex-shrink:0;width:64px;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden}
-.note-card.overview.first,.note-card.first{background:var(--panel);border:1.5px solid #E8B547}
-.note-card.overview.first::after,.note-card.first::after{display:none}
-.note-card.overview.first.done,.note-card.first.done{background:var(--done-soft);border-color:var(--border)}
+.note-card.overview.first,.note-card.first{background:var(--panel);border:none}
+.note-card.overview.first::after,.note-card.first::after{display:block;border-color:#E8B547}
+.note-card.overview.first.done,.note-card.first.done{background:var(--done-soft)}
+.note-card.overview.first.done::after,.note-card.first.done::after{border-color:var(--border)}
 
 /* 底部 Tab */
 .tabbar{display:flex;background:var(--panel);position:relative}
@@ -203,10 +204,12 @@ button{font-family:inherit;cursor:pointer}
 .todo-row .tr-text{font-size:15px;word-break:break-word}
 .tr-note{font-size:12.5px;color:var(--muted);word-break:break-word;margin-top:3px}
 .todo-row.done .tr-text{text-decoration:line-through;color:var(--muted)}
-.todo-row.first,.todo-row.overview.first{background:var(--panel);border:1.5px solid #E8B547}
-.todo-row.first::after,.todo-row.overview.first::after{display:none}
-.todo-row.first.done{background:var(--done-soft);border-color:var(--border)}
-.todo-row.overview.first.done{background:var(--panel);border-color:#E8B547}
+.todo-row.first,.todo-row.overview.first{background:var(--panel);border:none}
+.todo-row.first::after,.todo-row.overview.first::after{display:block;border-color:#E8B547}
+.todo-row.first.done{background:var(--done-soft)}
+.todo-row.first.done::after{border-color:var(--border)}
+.todo-row.overview.first.done{background:var(--panel)}
+.todo-row.overview.first.done::after{border-color:#E8B547}
 .todo-row.first .tr-text{font-weight:600;color:var(--text)}
 .todo-row.first.done .tr-text{font-weight:400;color:var(--muted)}
 
@@ -422,7 +425,7 @@ const ORDER_KEY="notes-app-v1-order";
 const RETIRED_KEY="notes-app-v1-retired";
 const CONSENT_KEY="notes-app-v1-consent";
 const APP_NAME="PEW";
-const APP_VERSION="2.59";
+const APP_VERSION="2.60";
 // 赞助收款配置：qr 填收款码图片地址或 data URI；international 填 PayPal / Ko-fi 链接或加密钱包地址
 const SPONSOR={
   wechat:{ qr:"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/EwvYbXJCBosW9sxynRScwW2snSg", note:"" },
