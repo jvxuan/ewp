@@ -39,6 +39,15 @@ python3 -m http.server 8011
 | --- | --- |
 | <img src="docs/sponsor/wechat-qr.png" width="160" alt="微信收款码" /> | <img src="docs/sponsor/alipay-qr.png" width="160" alt="支付宝收款码" /> |
 
+**国际渠道**（海外或不便扫码时可用，点击直达）：
+
+| 通道 | 链接 |
+| --- | --- |
+| PayPal | [paypal.me/jvxuan](https://paypal.me/jvxuan) |
+| Ko-fi | [ko-fi.com/jvxuan](https://ko-fi.com/jvxuan) |
+
+> 加密钱包通道暂未开放，App 内「国际」标签页会按配置自动显示可用的渠道。
+
 ## 目录结构
 
 ```
