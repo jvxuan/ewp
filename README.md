@@ -24,10 +24,10 @@ python3 -m http.server 8011
 
 ## 下载 Android APK
 
-调试签名包（minSdk 21 / targetSdk 34，应用名 PEW v2.62）：
+调试签名包（minSdk 21 / targetSdk 34，应用名 PEW v2.63）：
 
-- [Release 页面](https://github.com/jvxuan/ewp/releases/tag/v2.62)
-- [直接下载 PEW-debug-v2.62.apk](https://github.com/jvxuan/ewp/releases/download/v2.62/PEW-debug-v2.62.apk)
+- [Release 页面](https://github.com/jvxuan/ewp/releases/tag/v2.63)
+- [直接下载 PEW-debug-v2.63.apk](https://github.com/jvxuan/ewp/releases/download/v2.63/PEW-debug-v2.63.apk)
 
 > 离线壳 WebView 直接加载打进 APK 的 `assets/index.html`，无平台浮窗、断网可用；调试签名安装时可能需允许「未知来源」。
 
