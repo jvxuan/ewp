@@ -1,19 +1,26 @@
 package com.yizhizuo.app;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class MainActivity extends Activity {
 
@@ -42,8 +49,7 @@ public class MainActivity extends Activity {
         s.setBuiltInZoomControls(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        web.setWebViewClient(new WebViewClient() {
-            @Override
+        web.setWebViewClient(new WebViewClient() {            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
@@ -81,8 +87,54 @@ public class MainActivity extends Activity {
             }
         });
 
+        web.addJavascriptInterface(new SaveBridge(this), "PEW");
+
         setContentView(web);
         web.loadUrl(HOME_URL);
+    }
+
+    /**
+     * 供页面导出备份使用：把文本写进系统「下载」目录，返回保存位置描述（失败返回空串）。
+     * WebView 不触发 <a download>，因此在壳内必须由原生落盘。
+     */
+    private static class SaveBridge {
+        private final Activity act;
+
+        SaveBridge(Activity activity) {
+            this.act = activity;
+        }
+
+        @JavascriptInterface
+        public String saveText(String name, String text) {
+            try {
+                byte[] bytes = text.getBytes("UTF-8");
+                if (Build.VERSION.SDK_INT >= 29) {
+                    ContentValues v = new ContentValues();
+                    v.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+                    v.put(MediaStore.MediaColumns.MIME_TYPE, "application/json");
+                    v.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                    Uri uri = act.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                    if (uri == null) return "";
+                    OutputStream os = act.getContentResolver().openOutputStream(uri);
+                    if (os == null) return "";
+                    os.write(bytes);
+                    os.flush();
+                    os.close();
+                    return "Download/" + name;
+                }
+                File dir = act.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                if (dir == null) dir = act.getFilesDir();
+                if (!dir.exists() && !dir.mkdirs()) return "";
+                File f = new File(dir, name);
+                FileOutputStream fos = new FileOutputStream(f);
+                fos.write(bytes);
+                fos.flush();
+                fos.close();
+                return f.getAbsolutePath();
+            } catch (Exception e) {
+                return "";
+            }
+        }
     }
 
     private void applyChrome() {
